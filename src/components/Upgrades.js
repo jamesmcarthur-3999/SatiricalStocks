@@ -20,7 +20,7 @@ const Upgrades = {
             <div class="upgrade-effect">{{ upgrade.effect }}</div>
           </div>
           <div class="upgrade-purchase">
-            <span class="upgrade-price">${{ upgrade.price.toLocaleString() }}</span>
+            <span class="upgrade-price">\${{ upgrade.price.toLocaleString() }}</span>
             <button 
               class="btn" 
               @click="buyUpgrade(upgrade)" 
