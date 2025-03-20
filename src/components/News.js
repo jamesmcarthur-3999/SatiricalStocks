@@ -1,8 +1,6 @@
 // News component
-const News = {
-  props: {
-    newsItems: Array
-  },
+var News = {
+  props: ['newsItems'],
   template: `
     <div class="news-section">
       <h2 class="news-title">Breaking News</h2>
