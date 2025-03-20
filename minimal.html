@@ -1,0 +1,275 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>Satirical Stocks Minimal Demo</title>
+  <style>
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+      margin: 0;
+      padding: 0;
+      background-color: #f0f2f5;
+    }
+    
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 20px;
+    }
+    
+    h1 {
+      text-align: center;
+      background-color: #1e88e5;
+      color: white;
+      padding: 15px;
+      margin: 0 0 20px 0;
+    }
+    
+    .dashboard {
+      display: grid;
+      grid-template-columns: 3fr 1fr;
+      gap: 20px;
+    }
+    
+    .stock-item {
+      background: white;
+      padding: 10px;
+      margin-bottom: 10px;
+      border-radius: 4px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    
+    .stock-info {
+      font-weight: bold;
+    }
+    
+    .button-container {
+      display: flex;
+      gap: 10px;
+    }
+    
+    button {
+      padding: 8px 12px;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+    
+    .btn-buy {
+      background-color: #4caf50;
+      color: white;
+    }
+    
+    .btn-sell {
+      background-color: #f44336;
+      color: white;
+    }
+    
+    .positive {
+      color: #4caf50;
+    }
+    
+    .negative {
+      color: #f44336;
+    }
+    
+    .info-panel {
+      background: white;
+      padding: 15px;
+      border-radius: 4px;
+      margin-bottom: 20px;
+    }
+    
+    .wealth-meter {
+      height: 20px;
+      background-color: #e0e0e0;
+      border-radius: 10px;
+      margin: 10px 0;
+      overflow: hidden;
+    }
+    
+    .wealth-bar {
+      height: 100%;
+      background-color: #ffc107;
+      transition: width 0.5s ease;
+    }
+    
+    footer {
+      text-align: center;
+      padding: 20px;
+      margin-top: 40px;
+      font-size: 12px;
+      color: #777;
+    }
+  </style>
+  <script src="https://unpkg.com/vue@3.2.45/dist/vue.global.prod.js"></script>
+</head>
+<body>
+  <div id="app">
+    <h1>Satirical Stocks: Minimal Demo</h1>
+    
+    <div class="container">
+      <div class="dashboard">
+        <div class="stock-section">
+          <div class="info-panel">
+            <h2>Your Portfolio</h2>
+            <p>Cash: ${{ player.cash.toLocaleString() }}</p>
+            <p>Net Worth: ${{ netWorth.toLocaleString() }}</p>
+          </div>
+          
+          <h2>Stocks</h2>
+          <div class="stock-item" v-for="stock in stocks" :key="stock.id">
+            <div class="stock-info">
+              {{ stock.name }} ({{ stock.symbol }}) - ${{ stock.price.toFixed(2) }}
+              <span
+                :class="stock.change >= 0 ? 'positive' : 'negative'"
+              >
+                {{ stock.change >= 0 ? '+' : '' }}{{ stock.change.toFixed(2) }}%
+              </span>
+              <span v-if="stock.owned > 0">- Owned: {{ stock.owned }}</span>
+            </div>
+            <div class="button-container">
+              <button class="btn-buy" @click="buyStock(stock)" :disabled="player.cash < stock.price">Buy</button>
+              <button class="btn-sell" @click="sellStock(stock)" :disabled="stock.owned <= 0">Sell</button>
+            </div>
+          </div>
+        </div>
+        
+        <div class="side-panel">
+          <div class="info-panel">
+            <h2>Wealth Status</h2>
+            <div class="wealth-meter">
+              <div class="wealth-bar" :style="{ width: wealthPercentile + '%' }"></div>
+            </div>
+            <p>Status: {{ wealthStatus }}</p>
+            <p>Percentile: {{ wealthPercentile }}%</p>
+          </div>
+          
+          <div class="info-panel">
+            <h2>Breaking News</h2>
+            <div v-for="(item, index) in newsItems.slice(0, 3)" :key="index">
+              <p><strong>{{ item.headline }}</strong></p>
+              <p>Effect: {{ item.effect }}</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    <footer>
+      Satirical Stocks &copy; 2025 - This is just a minimal demo version.
+    </footer>
+  </div>
+
+  <script>
+    const { createApp, ref, computed, onMounted } = Vue;
+    
+    createApp({
+      setup() {
+        // Player state
+        const player = ref({
+          cash: 10000,
+          wealthStatusMessages: [
+            'Barely getting by',
+            'Middle class hero',
+            'Local big shot',
+            'Regional player',
+            'National influencer',
+            'Yacht owner',
+            'Private jet enthusiast',
+            'Island collector',
+            'Space tourism pioneer',
+            'Mars colony founder'
+          ]
+        });
+        
+        // Stocks
+        const stocks = ref([
+          { id: 1, name: 'TechGiant', symbol: 'TG', price: 150, change: 0, history: [], owned: 0 },
+          { id: 2, name: 'BankCorp', symbol: 'BC', price: 80, change: 0, history: [], owned: 0 },
+          { id: 3, name: 'OilFutures', symbol: 'OF', price: 65, change: 0, history: [], owned: 0 },
+          { id: 4, name: 'GreenEnergy', symbol: 'GE', price: 45, change: 0, history: [], owned: 0 },
+          { id: 5, name: 'FoodChain', symbol: 'FC', price: 30, change: 0, history: [], owned: 0 }
+        ]);
+        
+        // News
+        const newsItems = ref([
+          { headline: 'TechGiant announces new AI assistant that reads your thoughts', effect: 'TechGiant +5%' },
+          { headline: 'BankCorp CEO caught using company funds for gold-plated toilet', effect: 'BankCorp -8%' },
+          { headline: 'OilFutures discovers ocean can be converted to fuel with "minimal" environmental impact', effect: 'OilFutures +12%' }
+        ]);
+        
+        // Computed properties
+        const netWorth = computed(() => {
+          const stocksValue = stocks.value.reduce((total, stock) => {
+            return total + (stock.price * stock.owned);
+          }, 0);
+          return player.value.cash + stocksValue;
+        });
+        
+        const wealthPercentile = computed(() => {
+          // Satirical wealth meter - goes up to $1 billion
+          const maxWealth = 1000000000;
+          const percentage = (netWorth.value / maxWealth) * 100;
+          return Math.min(percentage, 100).toFixed(4);
+        });
+        
+        const wealthStatus = computed(() => {
+          const level = Math.min(Math.floor(wealthPercentile.value * player.value.wealthStatusMessages.length / 100), player.value.wealthStatusMessages.length - 1);
+          return player.value.wealthStatusMessages[level];
+        });
+        
+        // Methods
+        function updatePrices() {
+          stocks.value.forEach(stock => {
+            // Calculate new price
+            const volatility = 0.08; // Base volatility
+            const randomFactor = (Math.random() - 0.5) * 2; // Random between -1 and 1
+            const changePercent = randomFactor * volatility;
+            const changeAmount = stock.price * changePercent;
+            
+            const oldPrice = stock.price;
+            stock.price = Math.max(1, stock.price + changeAmount);
+            stock.change = ((stock.price - oldPrice) / oldPrice) * 100;
+          });
+        }
+        
+        function buyStock(stock) {
+          if (player.value.cash >= stock.price) {
+            player.value.cash -= stock.price;
+            stock.owned += 1;
+          }
+        }
+        
+        function sellStock(stock) {
+          if (stock.owned > 0) {
+            player.value.cash += stock.price;
+            stock.owned -= 1;
+          }
+        }
+        
+        // Setup game loop
+        onMounted(() => {
+          setInterval(() => {
+            updatePrices();
+          }, 3000); // Update prices every 3 seconds
+        });
+        
+        // Return state and methods
+        return {
+          player,
+          stocks,
+          newsItems,
+          netWorth,
+          wealthPercentile,
+          wealthStatus,
+          buyStock,
+          sellStock
+        };
+      }
+    }).mount('#app');
+  </script>
+</body>
+</html>
