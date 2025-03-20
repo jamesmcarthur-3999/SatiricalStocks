@@ -6,17 +6,15 @@
   <link rel="stylesheet" href="styles/main.css">
   <link rel="stylesheet" href="styles/new-components.css">
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&family=Comic+Neue:wght@700&display=swap">
+  <!-- Direct CDN links for dependencies to avoid local file errors -->
+  <script src="https://unpkg.com/vue@3.2.45/dist/vue.global.prod.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.1.2/dist/chart.umd.min.js"></script>
 </head>
 <body>
   <div id="app">
     <!-- The Vue app will mount here -->
   </div>
 
-  <!-- Scripts -->
-  <script src="node_modules/vue/dist/vue.global.js"></script>
-  <script src="node_modules/chart.js/dist/chart.umd.js"></script>
-  <script src="node_modules/vue-chartjs/dist/vue-chartjs.umd.js"></script>
-  
   <!-- App scripts -->
   <script src="src/components/StockChart.js"></script>
   <script src="src/components/Portfolio.js"></script>
