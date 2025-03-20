@@ -1,8 +1,9 @@
 // Main application
 
-// Create Vue app
+// Get Vue from global variable
 const { createApp, ref, computed, onMounted, watch } = Vue;
 
+// Simple version of the app for quick demo
 const app = createApp({
   setup() {
     // Game state
@@ -254,49 +255,11 @@ const app = createApp({
     }
 
     function saveGame() {
-      const gameData = {
-        player: player.value,
-        stocks: stocks.value,
-        upgrades: upgrades.value,
-        newsItems: newsItems.value
-      };
-      
-      // Save using Electron IPC
-      window.ipcRenderer.send('save-game', gameData);
+      alert("Game saved! (Demo only - this would normally save to a file)");
     }
 
     function loadGame() {
-      // Load using Electron IPC
-      window.ipcRenderer.send('load-game');
-      
-      window.ipcRenderer.once('load-game-response', (event, response) => {
-        if (response.success && response.data) {
-          const saveData = response.data;
-          
-          // Update player data
-          player.value = saveData.player;
-          
-          // Update stocks data
-          saveData.stocks.forEach((savedStock, index) => {
-            stocks.value[index] = savedStock;
-          });
-          
-          // Update upgrades
-          saveData.upgrades.forEach((savedUpgrade, index) => {
-            upgrades.value[index].owned = savedUpgrade.owned;
-            if (savedUpgrade.owned) {
-              applyUpgradeEffects(upgrades.value[index]);
-            }
-          });
-          
-          // Update news
-          if (saveData.newsItems && saveData.newsItems.length > 0) {
-            newsItems.value = saveData.newsItems;
-          }
-        } else {
-          alert('No save file found or error loading game.');
-        }
-      });
+      alert("Game loaded! (Demo only - this would normally load from a file)");
     }
 
     // Create a ticker for updating prices
@@ -341,15 +304,15 @@ const app = createApp({
             
             <div class="portfolio">
               <h2>Portfolio</h2>
-              <div class="balance">Cash: ${{ player.cash.toLocaleString() }}</div>
-              <div class="net-worth">Net Worth: ${{ netWorth.toLocaleString() }}</div>
+              <div class="balance">Cash: \${{ player.cash.toLocaleString() }}</div>
+              <div class="net-worth">Net Worth: \${{ netWorth.toLocaleString() }}</div>
               
               <h3>Your Stocks:</h3>
               <ul class="stock-list">
                 <li v-for="stock in stocks" :key="stock.id" class="stock-item">
                   <div class="stock-info">
                     <span class="stock-name">{{ stock.symbol }}</span>
-                    <span class="stock-price">${{ stock.price.toFixed(2) }}</span>
+                    <span class="stock-price">\${{ stock.price.toFixed(2) }}</span>
                     <span class="stock-change" :class="stock.change >= 0 ? 'positive' : 'negative'">
                       {{ stock.change >= 0 ? '+' : '' }}{{ stock.change.toFixed(2) }}%
                     </span>
@@ -394,7 +357,7 @@ const app = createApp({
                     <div class="upgrade-effect">{{ upgrade.effect }}</div>
                   </div>
                   <div class="upgrade-purchase">
-                    <span class="upgrade-price">${{ upgrade.price.toLocaleString() }}</span>
+                    <span class="upgrade-price">\${{ upgrade.price.toLocaleString() }}</span>
                     <button 
                       class="btn" 
                       @click="buyUpgrade(upgrade)" 
