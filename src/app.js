@@ -1,8 +1,8 @@
 // Main application
 
 // Simple version of the app for basic functionality
-const app = Vue.createApp({
-  data() {
+var app = Vue.createApp({
+  data: function() {
     return {
       player: {
         name: 'Aspiring Tycoon',
@@ -95,28 +95,29 @@ const app = Vue.createApp({
     };
   },
   computed: {
-    netWorth() {
-      const stocksValue = this.stocks.reduce((total, stock) => {
+    netWorth: function() {
+      var stocksValue = this.stocks.reduce(function(total, stock) {
         return total + (stock.price * stock.owned);
       }, 0);
       return this.player.cash + stocksValue;
     },
-    wealthPercentile() {
+    wealthPercentile: function() {
       // Satirical wealth meter - goes up to $1 billion
-      const maxWealth = 1000000000;
-      const percentage = (this.netWorth / maxWealth) * 100;
+      var maxWealth = 1000000000;
+      var percentage = (this.netWorth / maxWealth) * 100;
       return Math.min(percentage, 100).toFixed(4);
     },
-    wealthStatus() {
-      const level = Math.min(Math.floor(this.wealthPercentile * this.player.wealthStatusMessages.length / 100), this.player.wealthStatusMessages.length - 1);
+    wealthStatus: function() {
+      var level = Math.min(Math.floor(this.wealthPercentile * this.player.wealthStatusMessages.length / 100), this.player.wealthStatusMessages.length - 1);
       return this.player.wealthStatusMessages[level];
     }
   },
-  mounted() {
+  mounted: function() {
     // Initialize stock histories
-    this.stocks.forEach(stock => {
-      stock.history = Array(30).fill().map((_, i) => {
-        const basePrice = stock.price * 0.8;
+    var self = this;
+    this.stocks.forEach(function(stock) {
+      stock.history = Array(30).fill().map(function(_, i) {
+        var basePrice = stock.price * 0.8;
         return basePrice + (Math.random() * stock.price * 0.4);
       });
     });
@@ -125,8 +126,9 @@ const app = Vue.createApp({
     this.startGameLoop();
   },
   methods: {
-    updatePrices() {
-      this.stocks.forEach(stock => {
+    updatePrices: function() {
+      var self = this;
+      this.stocks.forEach(function(stock) {
         // Record previous price for history
         stock.history.push(stock.price);
         if (stock.history.length > 30) {
@@ -134,12 +136,12 @@ const app = Vue.createApp({
         }
 
         // Calculate new price
-        const volatility = 0.08; // Base volatility
-        const randomFactor = (Math.random() - 0.5) * 2; // Random between -1 and 1
-        const changePercent = randomFactor * volatility;
-        const changeAmount = stock.price * changePercent;
+        var volatility = 0.08; // Base volatility
+        var randomFactor = (Math.random() - 0.5) * 2; // Random between -1 and 1
+        var changePercent = randomFactor * volatility;
+        var changeAmount = stock.price * changePercent;
         
-        const oldPrice = stock.price;
+        var oldPrice = stock.price;
         stock.price = Math.max(1, stock.price + changeAmount);
         stock.change = ((stock.price - oldPrice) / oldPrice) * 100;
       });
@@ -152,20 +154,20 @@ const app = Vue.createApp({
       // Update player's net worth
       this.player.netWorth = this.netWorth;
     },
-    buyStock(stock) {
+    buyStock: function(stock) {
       if (this.player.cash >= stock.price) {
         this.player.cash -= stock.price;
         stock.owned += 1;
       }
     },
-    sellStock(stock) {
+    sellStock: function(stock) {
       if (stock.owned > 0) {
         this.player.cash += stock.price;
         stock.owned -= 1;
       }
     },
-    generateNews() {
-      const headlines = [
+    generateNews: function() {
+      var headlines = [
         { text: '{stock} CEO pays taxes "by accident," promises it won\'t happen again', effect: -0.05 },
         { text: '{stock} unveils product that\'s exactly like their last one but costs more', effect: 0.08 },
         { text: 'Workers at {stock} request livable wages, executives clutch pearls', effect: -0.07 },
@@ -179,18 +181,18 @@ const app = Vue.createApp({
       ];
 
       // Pick a random stock and headline
-      const randomStock = this.stocks[Math.floor(Math.random() * this.stocks.length)];
-      const randomHeadline = headlines[Math.floor(Math.random() * headlines.length)];
+      var randomStock = this.stocks[Math.floor(Math.random() * this.stocks.length)];
+      var randomHeadline = headlines[Math.floor(Math.random() * headlines.length)];
 
       // Apply effect to stock price
-      const effectPercent = randomHeadline.effect;
-      const effectAmount = randomStock.price * effectPercent;
+      var effectPercent = randomHeadline.effect;
+      var effectAmount = randomStock.price * effectPercent;
       randomStock.price = Math.max(1, randomStock.price + effectAmount);
       randomStock.change = effectPercent * 100;
 
       // Add to news items
-      const newsText = randomHeadline.text.replace('{stock}', randomStock.name);
-      const effectText = `${randomStock.symbol} ${effectPercent > 0 ? '+' : ''}${(effectPercent * 100).toFixed(1)}%`;
+      var newsText = randomHeadline.text.replace('{stock}', randomStock.name);
+      var effectText = randomStock.symbol + " " + (effectPercent > 0 ? '+' : '') + (effectPercent * 100).toFixed(1) + "%";
       
       this.newsItems.unshift({
         headline: newsText,
@@ -202,7 +204,7 @@ const app = Vue.createApp({
         this.newsItems.pop();
       }
     },
-    buyUpgrade(upgrade) {
+    buyUpgrade: function(upgrade) {
       if (this.player.cash >= upgrade.price && !upgrade.owned) {
         this.player.cash -= upgrade.price;
         upgrade.owned = true;
@@ -211,7 +213,8 @@ const app = Vue.createApp({
         this.applyUpgradeEffects(upgrade);
       }
     },
-    applyUpgradeEffects(upgrade) {
+    applyUpgradeEffects: function(upgrade) {
+      var self = this;
       // Implement different effects based on the upgrade
       switch(upgrade.id) {
         case 1: // Financial Advisor
@@ -222,8 +225,8 @@ const app = Vue.createApp({
           break;
         case 3: // Algorithm Trading Bot
           // Auto-generates small profits each day
-          setInterval(() => {
-            this.player.cash += 500;
+          setInterval(function() {
+            self.player.cash += 500;
           }, 60000); // Once per minute in game time
           break;
         case 4: // Politician in Your Pocket
@@ -237,117 +240,119 @@ const app = Vue.createApp({
           break;
       }
     },
-    saveGame() {
+    saveGame: function() {
       alert("Game saved! (Demo only - this would normally save to a file)");
     },
-    loadGame() {
+    loadGame: function() {
       alert("Game loaded! (Demo only - this would normally load from a file)");
     },
-    startGameLoop() {
-      this.gameInterval = setInterval(() => {
-        this.updatePrices();
+    startGameLoop: function() {
+      var self = this;
+      this.gameInterval = setInterval(function() {
+        self.updatePrices();
       }, 5000); // Update every 5 seconds
     }
   },
-  template: `
-    <div class="game-container">
-      <header class="game-header">
-        <h1 class="game-title">Satirical Stocks: The Wealth Hoarding Simulator</h1>
-      </header>
+  template: 
+    '<div class="game-container">' +
+      '<header class="game-header">' +
+        '<h1 class="game-title">Satirical Stocks: The Wealth Hoarding Simulator</h1>' +
+      '</header>' +
       
-      <div class="container">
-        <div class="dashboard">
-          <div class="stock-section">
-            <stock-chart :stocks="stocks"></stock-chart>
+      '<div class="container">' +
+        '<div class="dashboard">' +
+          '<div class="stock-section">' +
+            '<stock-chart :stocks="stocks"></stock-chart>' +
             
-            <div class="portfolio">
-              <h2>Portfolio</h2>
-              <div class="balance">Cash: ${{ player.cash.toLocaleString() }}</div>
-              <div class="net-worth">Net Worth: ${{ netWorth.toLocaleString() }}</div>
+            '<div class="portfolio">' +
+              '<h2>Portfolio</h2>' +
+              '<div class="balance">Cash: ${{ player.cash.toLocaleString() }}</div>' +
+              '<div class="net-worth">Net Worth: ${{ netWorth.toLocaleString() }}</div>' +
               
-              <h3>Your Stocks:</h3>
-              <ul class="stock-list">
-                <li v-for="stock in stocks" :key="stock.id" class="stock-item">
-                  <div class="stock-info">
-                    <span class="stock-name">{{ stock.symbol }}</span>
-                    <span class="stock-price">${{ stock.price.toFixed(2) }}</span>
-                    <span class="stock-change" :class="stock.change >= 0 ? 'positive' : 'negative'">
-                      {{ stock.change >= 0 ? '+' : '' }}{{ stock.change.toFixed(2) }}%
-                    </span>
-                  </div>
-                  <div class="stock-owned" v-if="stock.owned > 0">Owned: {{ stock.owned }}</div>
-                  <div class="stock-actions">
-                    <button class="btn btn-buy" @click="buyStock(stock)" :disabled="player.cash < stock.price">Buy</button>
-                    <button class="btn btn-sell" @click="sellStock(stock)" :disabled="stock.owned <= 0">Sell</button>
-                  </div>
-                </li>
-              </ul>
-            </div>
+              '<h3>Your Stocks:</h3>' +
+              '<ul class="stock-list">' +
+                '<li v-for="stock in stocks" :key="stock.id" class="stock-item">' +
+                  '<div class="stock-info">' +
+                    '<span class="stock-name">{{ stock.symbol }}</span>' +
+                    '<span class="stock-price">${{ stock.price.toFixed(2) }}</span>' +
+                    '<span class="stock-change" :class="stock.change >= 0 ? \'positive\' : \'negative\'">' +
+                      '{{ stock.change >= 0 ? "+" : "" }}{{ stock.change.toFixed(2) }}%' +
+                    '</span>' +
+                  '</div>' +
+                  '<div class="stock-owned" v-if="stock.owned > 0">Owned: {{ stock.owned }}</div>' +
+                  '<div class="stock-actions">' +
+                    '<button class="btn btn-buy" @click="buyStock(stock)" :disabled="player.cash < stock.price">Buy</button>' +
+                    '<button class="btn btn-sell" @click="sellStock(stock)" :disabled="stock.owned <= 0">Sell</button>' +
+                  '</div>' +
+                '</li>' +
+              '</ul>' +
+            '</div>' +
             
-            <div class="news-section">
-              <h2 class="news-title">Breaking News</h2>
-              <ul class="news-list">
-                <li v-for="(item, index) in newsItems" :key="index" class="news-item">
-                  <div class="news-headline">{{ item.headline }}</div>
-                  <div class="news-effect">Effect: {{ item.effect }}</div>
-                </li>
-              </ul>
-            </div>
-          </div>
+            '<div class="news-section">' +
+              '<h2 class="news-title">Breaking News</h2>' +
+              '<ul class="news-list">' +
+                '<li v-for="(item, index) in newsItems" :key="index" class="news-item">' +
+                  '<div class="news-headline">{{ item.headline }}</div>' +
+                  '<div class="news-effect">Effect: {{ item.effect }}</div>' +
+                '</li>' +
+              '</ul>' +
+            '</div>' +
+          '</div>' +
           
-          <div class="side-panel">
-            <div class="wealth-meter">
-              <h2 class="wealth-title">Wealth Hoarder Status</h2>
-              <div class="wealth-progress">
-                <div class="wealth-bar" :style="{ width: wealthPercentile + '%' }"></div>
-              </div>
-              <div class="wealth-status">{{ wealthStatus }}</div>
-              <div class="wealth-percentile">You are wealthier than {{ wealthPercentile }}% of the population</div>
-            </div>
+          '<div class="side-panel">' +
+            '<div class="wealth-meter">' +
+              '<h2 class="wealth-title">Wealth Hoarder Status</h2>' +
+              '<div class="wealth-progress">' +
+                '<div class="wealth-bar" :style="{ width: wealthPercentile + \'%\' }"></div>' +
+              '</div>' +
+              '<div class="wealth-status">{{ wealthStatus }}</div>' +
+              '<div class="wealth-percentile">You are wealthier than {{ wealthPercentile }}% of the population</div>' +
+            '</div>' +
             
-            <div class="upgrade-shop">
-              <h2 class="upgrade-title">Ways to "Optimize" Your Wealth</h2>
-              <ul class="upgrade-list">
-                <li v-for="upgrade in upgrades" :key="upgrade.id" class="upgrade-item">
-                  <div class="upgrade-info">
-                    <div class="upgrade-name">{{ upgrade.name }}</div>
-                    <div class="upgrade-description">{{ upgrade.description }}</div>
-                    <div class="upgrade-effect">{{ upgrade.effect }}</div>
-                  </div>
-                  <div class="upgrade-purchase">
-                    <span class="upgrade-price">${{ upgrade.price.toLocaleString() }}</span>
-                    <button 
-                      class="btn" 
-                      @click="buyUpgrade(upgrade)" 
-                      :disabled="player.cash < upgrade.price || upgrade.owned"
-                    >
-                      {{ upgrade.owned ? 'Owned' : 'Buy' }}
-                    </button>
-                  </div>
-                </li>
-              </ul>
-            </div>
+            '<div class="upgrade-shop">' +
+              '<h2 class="upgrade-title">Ways to "Optimize" Your Wealth</h2>' +
+              '<ul class="upgrade-list">' +
+                '<li v-for="upgrade in upgrades" :key="upgrade.id" class="upgrade-item">' +
+                  '<div class="upgrade-info">' +
+                    '<div class="upgrade-name">{{ upgrade.name }}</div>' +
+                    '<div class="upgrade-description">{{ upgrade.description }}</div>' +
+                    '<div class="upgrade-effect">{{ upgrade.effect }}</div>' +
+                  '</div>' +
+                  '<div class="upgrade-purchase">' +
+                    '<span class="upgrade-price">${{ upgrade.price.toLocaleString() }}</span>' +
+                    '<button ' +
+                      'class="btn" ' +
+                      '@click="buyUpgrade(upgrade)" ' +
+                      ':disabled="player.cash < upgrade.price || upgrade.owned"' +
+                    '>' +
+                      '{{ upgrade.owned ? "Owned" : "Buy" }}' +
+                    '</button>' +
+                  '</div>' +
+                '</li>' +
+              '</ul>' +
+            '</div>' +
             
-            <div class="game-controls">
-              <button class="btn" @click="saveGame">Save Game</button>
-              <button class="btn" @click="loadGame">Load Game</button>
-            </div>
-          </div>
-        </div>
-      </div>
+            '<div class="game-controls">' +
+              '<button class="btn" @click="saveGame">Save Game</button>' +
+              '<button class="btn" @click="loadGame">Load Game</button>' +
+            '</div>' +
+          '</div>' +
+        '</div>' +
+      '</div>' +
       
-      <footer class="game-footer">
-        <p>Satirical Stocks &copy; 2025 - Remember, it's just a game... unlike real wealth inequality!</p>
-      </footer>
-    </div>
-  `
+      '<footer class="game-footer">' +
+        '<p>Satirical Stocks &copy; 2025 - Remember, it\'s just a game... unlike real wealth inequality!</p>' +
+      '</footer>' +
+    '</div>'
 });
 
 // Register components
 app.component('stock-chart', StockChart);
+/* We'll use direct inclusion in the template instead of separate components for now
 app.component('portfolio', Portfolio);
 app.component('news-section', News);
 app.component('upgrade-shop', Upgrades);
+*/
 
 // Mount the app
 app.mount('#app');
