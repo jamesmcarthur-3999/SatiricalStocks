@@ -1,31 +1,30 @@
 // StockChart component
-const StockChart = {
-  props: {
-    stocks: Array
-  },
-  data() {
+var StockChart = {
+  props: ['stocks'],
+  data: function() {
     return {
       selectedStock: null,
       chart: null
     };
   },
-  mounted() {
+  mounted: function() {
     // Use first stock by default
     if (this.stocks && this.stocks.length > 0) {
       this.selectedStock = this.stocks[0];
-      this.$nextTick(() => {
-        this.createChart();
-      });
+      var self = this;
+      setTimeout(function() {
+        self.createChart();
+      }, 100);
     }
   },
   methods: {
-    selectStock(stock) {
+    selectStock: function(stock) {
       this.selectedStock = stock;
       this.updateChart();
     },
-    createChart() {
+    createChart: function() {
       try {
-        const ctx = this.$refs.stockChart.getContext('2d');
+        var ctx = this.$refs.stockChart.getContext('2d');
         
         if (!ctx) {
           console.error("Could not get canvas context");
@@ -40,7 +39,7 @@ const StockChart = {
         this.chart = new Chart(ctx, {
           type: 'line',
           data: {
-            labels: Array(30).fill().map((_, i) => `Day ${30-i}`).reverse(),
+            labels: Array(30).fill().map(function(_, i) { return 'Day ' + (30-i); }).reverse(),
             datasets: [{
               label: this.selectedStock.name,
               data: this.selectedStock.history,
@@ -79,7 +78,7 @@ const StockChart = {
         console.error("Error creating chart:", err);
       }
     },
-    updateChart() {
+    updateChart: function() {
       if (!this.chart || !this.selectedStock) return;
       
       try {
@@ -94,7 +93,7 @@ const StockChart = {
   watch: {
     'stocks': {
       deep: true,
-      handler() {
+      handler: function() {
         if (this.selectedStock && this.chart) {
           this.updateChart();
         }
