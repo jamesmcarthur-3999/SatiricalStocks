@@ -1,134 +1,132 @@
 // Main application
 
-// Get Vue from global variable
-const { createApp, ref, computed, onMounted, watch } = Vue;
-
-// Simple version of the app for quick demo
-const app = createApp({
-  setup() {
-    // Game state
-    const player = ref({
-      name: 'Aspiring Tycoon',
-      cash: 10000,
-      netWorth: 10000,
-      wealthLevel: 1,
-      wealthStatusMessages: [
-        'Barely getting by',
-        'Middle class hero',
-        'Local big shot',
-        'Regional player',
-        'National influencer',
-        'Yacht owner',
-        'Private jet enthusiast',
-        'Island collector',
-        'Space tourism pioneer',
-        'Mars colony founder'
-      ]
-    });
-
-    const stocks = ref([
-      { id: 1, name: 'TechGiant', symbol: 'TG', price: 150, change: 0, history: [], owned: 0 },
-      { id: 2, name: 'BankCorp', symbol: 'BC', price: 80, change: 0, history: [], owned: 0 },
-      { id: 3, name: 'OilFutures', symbol: 'OF', price: 65, change: 0, history: [], owned: 0 },
-      { id: 4, name: 'GreenEnergy', symbol: 'GE', price: 45, change: 0, history: [], owned: 0 },
-      { id: 5, name: 'FoodChain', symbol: 'FC', price: 30, change: 0, history: [], owned: 0 },
-      { id: 6, name: 'LuxuryBrand', symbol: 'LB', price: 120, change: 0, history: [], owned: 0 },
-      { id: 7, name: 'SocialMedia', symbol: 'SM', price: 90, change: 0, history: [], owned: 0 },
-      { id: 8, name: 'MemeStock', symbol: 'MS', price: 10, change: 0, history: [], owned: 0 },
-      { id: 9, name: 'CryptoCorp', symbol: 'CC', price: 35, change: 0, history: [], owned: 0 },
-      { id: 10, name: 'RealEstate', symbol: 'RE', price: 70, change: 0, history: [], owned: 0 }
-    ]);
-
-    // Initialize stock history
-    stocks.value.forEach(stock => {
+// Simple version of the app for basic functionality
+const app = Vue.createApp({
+  data() {
+    return {
+      player: {
+        name: 'Aspiring Tycoon',
+        cash: 10000,
+        netWorth: 10000,
+        wealthLevel: 1,
+        wealthStatusMessages: [
+          'Barely getting by',
+          'Middle class hero',
+          'Local big shot',
+          'Regional player',
+          'National influencer',
+          'Yacht owner',
+          'Private jet enthusiast',
+          'Island collector',
+          'Space tourism pioneer',
+          'Mars colony founder'
+        ]
+      },
+      stocks: [
+        { id: 1, name: 'TechGiant', symbol: 'TG', price: 150, change: 0, history: [], owned: 0 },
+        { id: 2, name: 'BankCorp', symbol: 'BC', price: 80, change: 0, history: [], owned: 0 },
+        { id: 3, name: 'OilFutures', symbol: 'OF', price: 65, change: 0, history: [], owned: 0 },
+        { id: 4, name: 'GreenEnergy', symbol: 'GE', price: 45, change: 0, history: [], owned: 0 },
+        { id: 5, name: 'FoodChain', symbol: 'FC', price: 30, change: 0, history: [], owned: 0 },
+        { id: 6, name: 'LuxuryBrand', symbol: 'LB', price: 120, change: 0, history: [], owned: 0 },
+        { id: 7, name: 'SocialMedia', symbol: 'SM', price: 90, change: 0, history: [], owned: 0 },
+        { id: 8, name: 'MemeStock', symbol: 'MS', price: 10, change: 0, history: [], owned: 0 },
+        { id: 9, name: 'CryptoCorp', symbol: 'CC', price: 35, change: 0, history: [], owned: 0 },
+        { id: 10, name: 'RealEstate', symbol: 'RE', price: 70, change: 0, history: [], owned: 0 }
+      ],
+      newsItems: [
+        { headline: 'TechGiant announces new AI assistant that reads your thoughts', effect: 'TechGiant +5%' },
+        { headline: 'BankCorp CEO caught using company funds for gold-plated toilet', effect: 'BankCorp -8%' },
+        { headline: 'OilFutures discovers ocean can be converted to fuel with "minimal" environmental impact', effect: 'OilFutures +12%' },
+        { headline: 'GreenEnergy unveils solar panel that works at night, somehow', effect: 'GreenEnergy +15%' },
+        { headline: 'FoodChain introduces burger that is "technically food"', effect: 'FoodChain -3%' }
+      ],
+      upgrades: [
+        {
+          id: 1,
+          name: 'Financial Advisor',
+          description: 'Hire someone to tell you what you already know, but with confidence',
+          price: 5000,
+          owned: false,
+          effect: 'Reduces random volatility by 10%'
+        },
+        {
+          id: 2,
+          name: 'Insider Trading Friend',
+          description: 'Not technically illegal if you call it a "hunch"',
+          price: 20000,
+          owned: false,
+          effect: 'Occasional tips about big market moves'
+        },
+        {
+          id: 3,
+          name: 'Algorithm Trading Bot',
+          description: 'It uses AI, machine learning, and other buzzwords to make trades faster than humans',
+          price: 50000,
+          owned: false,
+          effect: 'Automatic small profits each day'
+        },
+        {
+          id: 4,
+          name: 'Politician in Your Pocket',
+          description: 'Lobbying is just friendship with benefits for your portfolio',
+          price: 100000,
+          owned: false,
+          effect: 'Occasional favorable regulation changes'
+        },
+        {
+          id: 5,
+          name: 'Media Manipulation Machine',
+          description: 'Control the narrative, control the market',
+          price: 250000,
+          owned: false,
+          effect: 'Create your own news events'
+        },
+        {
+          id: 6,
+          name: 'Tax Haven Access',
+          description: 'Your money goes on vacation and never comes back to the tax authority',
+          price: 500000,
+          owned: false,
+          effect: 'Reduce taxes on profits by 50%'
+        }
+      ],
+      gameInterval: null
+    };
+  },
+  computed: {
+    netWorth() {
+      const stocksValue = this.stocks.reduce((total, stock) => {
+        return total + (stock.price * stock.owned);
+      }, 0);
+      return this.player.cash + stocksValue;
+    },
+    wealthPercentile() {
+      // Satirical wealth meter - goes up to $1 billion
+      const maxWealth = 1000000000;
+      const percentage = (this.netWorth / maxWealth) * 100;
+      return Math.min(percentage, 100).toFixed(4);
+    },
+    wealthStatus() {
+      const level = Math.min(Math.floor(this.wealthPercentile * this.player.wealthStatusMessages.length / 100), this.player.wealthStatusMessages.length - 1);
+      return this.player.wealthStatusMessages[level];
+    }
+  },
+  mounted() {
+    // Initialize stock histories
+    this.stocks.forEach(stock => {
       stock.history = Array(30).fill().map((_, i) => {
         const basePrice = stock.price * 0.8;
         return basePrice + (Math.random() * stock.price * 0.4);
       });
     });
-
-    const newsItems = ref([
-      { headline: 'TechGiant announces new AI assistant that reads your thoughts', effect: 'TechGiant +5%' },
-      { headline: 'BankCorp CEO caught using company funds for gold-plated toilet', effect: 'BankCorp -8%' },
-      { headline: 'OilFutures discovers ocean can be converted to fuel with "minimal" environmental impact', effect: 'OilFutures +12%' },
-      { headline: 'GreenEnergy unveils solar panel that works at night, somehow', effect: 'GreenEnergy +15%' },
-      { headline: 'FoodChain introduces burger that is "technically food"', effect: 'FoodChain -3%' }
-    ]);
-
-    const upgrades = ref([
-      {
-        id: 1,
-        name: 'Financial Advisor',
-        description: 'Hire someone to tell you what you already know, but with confidence',
-        price: 5000,
-        owned: false,
-        effect: 'Reduces random volatility by 10%'
-      },
-      {
-        id: 2,
-        name: 'Insider Trading Friend',
-        description: 'Not technically illegal if you call it a "hunch"',
-        price: 20000,
-        owned: false,
-        effect: 'Occasional tips about big market moves'
-      },
-      {
-        id: 3,
-        name: 'Algorithm Trading Bot',
-        description: 'It uses AI, machine learning, and other buzzwords to make trades faster than humans',
-        price: 50000,
-        owned: false,
-        effect: 'Automatic small profits each day'
-      },
-      {
-        id: 4,
-        name: 'Politician in Your Pocket',
-        description: 'Lobbying is just friendship with benefits for your portfolio',
-        price: 100000,
-        owned: false,
-        effect: 'Occasional favorable regulation changes'
-      },
-      {
-        id: 5,
-        name: 'Media Manipulation Machine',
-        description: 'Control the narrative, control the market',
-        price: 250000,
-        owned: false,
-        effect: 'Create your own news events'
-      },
-      {
-        id: 6,
-        name: 'Tax Haven Access',
-        description: 'Your money goes on vacation and never comes back to the tax authority',
-        price: 500000,
-        owned: false,
-        effect: 'Reduce taxes on profits by 50%'
-      }
-    ]);
-
-    // Computed properties
-    const netWorth = computed(() => {
-      const stocksValue = stocks.value.reduce((total, stock) => {
-        return total + (stock.price * stock.owned);
-      }, 0);
-      return player.value.cash + stocksValue;
-    });
-
-    const wealthPercentile = computed(() => {
-      // Satirical wealth meter - goes up to $1 billion
-      const maxWealth = 1000000000;
-      const percentage = (netWorth.value / maxWealth) * 100;
-      return Math.min(percentage, 100).toFixed(4);
-    });
-
-    const wealthStatus = computed(() => {
-      const level = Math.min(Math.floor(wealthPercentile.value * player.value.wealthStatusMessages.length / 100), player.value.wealthStatusMessages.length - 1);
-      return player.value.wealthStatusMessages[level];
-    });
-
-    // Methods
-    function updatePrices() {
-      stocks.value.forEach(stock => {
+    
+    // Start game loop
+    this.startGameLoop();
+  },
+  methods: {
+    updatePrices() {
+      this.stocks.forEach(stock => {
         // Record previous price for history
         stock.history.push(stock.price);
         if (stock.history.length > 30) {
@@ -148,34 +146,25 @@ const app = createApp({
 
       // Update news occasionally
       if (Math.random() < 0.3) { // 30% chance of news each update
-        generateNews();
+        this.generateNews();
       }
 
       // Update player's net worth
-      player.value.netWorth = netWorth.value;
-    }
-
-    function buyStock(stock) {
-      if (player.value.cash >= stock.price) {
-        player.value.cash -= stock.price;
+      this.player.netWorth = this.netWorth;
+    },
+    buyStock(stock) {
+      if (this.player.cash >= stock.price) {
+        this.player.cash -= stock.price;
         stock.owned += 1;
-        updateNetWorth();
       }
-    }
-
-    function sellStock(stock) {
+    },
+    sellStock(stock) {
       if (stock.owned > 0) {
-        player.value.cash += stock.price;
+        this.player.cash += stock.price;
         stock.owned -= 1;
-        updateNetWorth();
       }
-    }
-
-    function updateNetWorth() {
-      player.value.netWorth = netWorth.value;
-    }
-
-    function generateNews() {
+    },
+    generateNews() {
       const headlines = [
         { text: '{stock} CEO pays taxes "by accident," promises it won\'t happen again', effect: -0.05 },
         { text: '{stock} unveils product that\'s exactly like their last one but costs more', effect: 0.08 },
@@ -190,7 +179,7 @@ const app = createApp({
       ];
 
       // Pick a random stock and headline
-      const randomStock = stocks.value[Math.floor(Math.random() * stocks.value.length)];
+      const randomStock = this.stocks[Math.floor(Math.random() * this.stocks.length)];
       const randomHeadline = headlines[Math.floor(Math.random() * headlines.length)];
 
       // Apply effect to stock price
@@ -203,30 +192,26 @@ const app = createApp({
       const newsText = randomHeadline.text.replace('{stock}', randomStock.name);
       const effectText = `${randomStock.symbol} ${effectPercent > 0 ? '+' : ''}${(effectPercent * 100).toFixed(1)}%`;
       
-      newsItems.value.unshift({
+      this.newsItems.unshift({
         headline: newsText,
         effect: effectText
       });
 
       // Keep only the 5 most recent news items
-      if (newsItems.value.length > 5) {
-        newsItems.value.pop();
+      if (this.newsItems.length > 5) {
+        this.newsItems.pop();
       }
-    }
-
-    function buyUpgrade(upgrade) {
-      if (player.value.cash >= upgrade.price && !upgrade.owned) {
-        player.value.cash -= upgrade.price;
+    },
+    buyUpgrade(upgrade) {
+      if (this.player.cash >= upgrade.price && !upgrade.owned) {
+        this.player.cash -= upgrade.price;
         upgrade.owned = true;
         
         // Apply upgrade effects
-        applyUpgradeEffects(upgrade);
-        
-        updateNetWorth();
+        this.applyUpgradeEffects(upgrade);
       }
-    }
-
-    function applyUpgradeEffects(upgrade) {
+    },
+    applyUpgradeEffects(upgrade) {
       // Implement different effects based on the upgrade
       switch(upgrade.id) {
         case 1: // Financial Advisor
@@ -238,8 +223,7 @@ const app = createApp({
         case 3: // Algorithm Trading Bot
           // Auto-generates small profits each day
           setInterval(() => {
-            player.value.cash += 500;
-            updateNetWorth();
+            this.player.cash += 500;
           }, 60000); // Once per minute in game time
           break;
         case 4: // Politician in Your Pocket
@@ -252,44 +236,18 @@ const app = createApp({
           // Reduces tax on profits
           break;
       }
-    }
-
-    function saveGame() {
+    },
+    saveGame() {
       alert("Game saved! (Demo only - this would normally save to a file)");
-    }
-
-    function loadGame() {
+    },
+    loadGame() {
       alert("Game loaded! (Demo only - this would normally load from a file)");
-    }
-
-    // Create a ticker for updating prices
-    let gameInterval;
-    function startGameLoop() {
-      gameInterval = setInterval(() => {
-        updatePrices();
+    },
+    startGameLoop() {
+      this.gameInterval = setInterval(() => {
+        this.updatePrices();
       }, 5000); // Update every 5 seconds
     }
-
-    // Setup and lifecycle methods
-    onMounted(() => {
-      startGameLoop();
-    });
-
-    // Expose methods and state to the template
-    return {
-      player,
-      stocks,
-      newsItems,
-      upgrades,
-      netWorth,
-      wealthPercentile,
-      wealthStatus,
-      buyStock,
-      sellStock,
-      buyUpgrade,
-      saveGame,
-      loadGame
-    };
   },
   template: `
     <div class="game-container">
@@ -304,15 +262,15 @@ const app = createApp({
             
             <div class="portfolio">
               <h2>Portfolio</h2>
-              <div class="balance">Cash: \${{ player.cash.toLocaleString() }}</div>
-              <div class="net-worth">Net Worth: \${{ netWorth.toLocaleString() }}</div>
+              <div class="balance">Cash: ${{ player.cash.toLocaleString() }}</div>
+              <div class="net-worth">Net Worth: ${{ netWorth.toLocaleString() }}</div>
               
               <h3>Your Stocks:</h3>
               <ul class="stock-list">
                 <li v-for="stock in stocks" :key="stock.id" class="stock-item">
                   <div class="stock-info">
                     <span class="stock-name">{{ stock.symbol }}</span>
-                    <span class="stock-price">\${{ stock.price.toFixed(2) }}</span>
+                    <span class="stock-price">${{ stock.price.toFixed(2) }}</span>
                     <span class="stock-change" :class="stock.change >= 0 ? 'positive' : 'negative'">
                       {{ stock.change >= 0 ? '+' : '' }}{{ stock.change.toFixed(2) }}%
                     </span>
@@ -357,7 +315,7 @@ const app = createApp({
                     <div class="upgrade-effect">{{ upgrade.effect }}</div>
                   </div>
                   <div class="upgrade-purchase">
-                    <span class="upgrade-price">\${{ upgrade.price.toLocaleString() }}</span>
+                    <span class="upgrade-price">${{ upgrade.price.toLocaleString() }}</span>
                     <button 
                       class="btn" 
                       @click="buyUpgrade(upgrade)" 
@@ -385,10 +343,11 @@ const app = createApp({
   `
 });
 
-// Mount the app
+// Register components
 app.component('stock-chart', StockChart);
 app.component('portfolio', Portfolio);
 app.component('news-section', News);
 app.component('upgrade-shop', Upgrades);
 
+// Mount the app
 app.mount('#app');
