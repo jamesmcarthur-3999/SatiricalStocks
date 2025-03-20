@@ -4,6 +4,10 @@ A satirical stock market simulation game that pokes fun at wealth hoarding while
 
 ![Satirical Stocks Screenshot](assets/icons/icon.png)
 
+## Quick Start
+
+To quickly try a working version of the game, open `minimal.html` directly in your browser. This is a simplified version that works without any build steps or dependencies.
+
 ## About the Game
 
 Satirical Stocks is a tongue-in-cheek simulation game that lets players experience the absurdity of wealth accumulation through stock market trading. The game features:
@@ -89,6 +93,15 @@ npm start
 # Build for Windows
 npm run build:win
 ```
+
+## Troubleshooting
+
+If you encounter issues with the full application:
+
+1. Try the minimal demo (`minimal.html`) which doesn't require any build steps
+2. Check the browser console for any error messages
+3. Make sure all resources like CSS and JavaScript files are properly loaded
+4. If there are dependency issues, run `npm install` to ensure all required packages are installed
 
 ## License
 
