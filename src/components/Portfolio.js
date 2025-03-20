@@ -1,15 +1,11 @@
 // Portfolio component
-const Portfolio = {
-  props: {
-    player: Object,
-    stocks: Array,
-    netWorth: Number
-  },
+var Portfolio = {
+  props: ['player', 'stocks', 'netWorth'],
   methods: {
-    buyStock(stock) {
+    buyStock: function(stock) {
       this.$emit('buy-stock', stock);
     },
-    sellStock(stock) {
+    sellStock: function(stock) {
       this.$emit('sell-stock', stock);
     }
   },
@@ -24,7 +20,7 @@ const Portfolio = {
         <li v-for="stock in stocks" :key="stock.id" class="stock-item">
           <div class="stock-info">
             <span class="stock-name">{{ stock.symbol }}</span>
-            <span class="stock-price">${{ stock.price.toFixed(2) }}</span>
+            <span class="stock-price">\${{ stock.price.toFixed(2) }}</span>
             <span class="stock-change" :class="stock.change >= 0 ? 'positive' : 'negative'">
               {{ stock.change >= 0 ? '+' : '' }}{{ stock.change.toFixed(2) }}%
             </span>
