@@ -1,8 +1,8 @@
 // Main application
 
 // Simple version of the app for basic functionality
-var app = Vue.createApp({
-  data: function() {
+const app = Vue.createApp({
+  data() {
     return {
       player: {
         name: 'Aspiring Tycoon',
@@ -95,29 +95,28 @@ var app = Vue.createApp({
     };
   },
   computed: {
-    netWorth: function() {
-      var stocksValue = this.stocks.reduce(function(total, stock) {
+    netWorth() {
+      const stocksValue = this.stocks.reduce((total, stock) => {
         return total + (stock.price * stock.owned);
       }, 0);
       return this.player.cash + stocksValue;
     },
-    wealthPercentile: function() {
+    wealthPercentile() {
       // Satirical wealth meter - goes up to $1 billion
-      var maxWealth = 1000000000;
-      var percentage = (this.netWorth / maxWealth) * 100;
+      const maxWealth = 1000000000;
+      const percentage = (this.netWorth / maxWealth) * 100;
       return Math.min(percentage, 100).toFixed(4);
     },
-    wealthStatus: function() {
-      var level = Math.min(Math.floor(this.wealthPercentile * this.player.wealthStatusMessages.length / 100), this.player.wealthStatusMessages.length - 1);
+    wealthStatus() {
+      const level = Math.min(Math.floor(this.wealthPercentile * this.player.wealthStatusMessages.length / 100), this.player.wealthStatusMessages.length - 1);
       return this.player.wealthStatusMessages[level];
     }
   },
-  mounted: function() {
+  mounted() {
     // Initialize stock histories
-    var self = this;
-    this.stocks.forEach(function(stock) {
-      stock.history = Array(30).fill().map(function(_, i) {
-        var basePrice = stock.price * 0.8;
+    this.stocks.forEach(stock => {
+      stock.history = Array(30).fill().map((_, i) => {
+        const basePrice = stock.price * 0.8;
         return basePrice + (Math.random() * stock.price * 0.4);
       });
     });
@@ -126,9 +125,8 @@ var app = Vue.createApp({
     this.startGameLoop();
   },
   methods: {
-    updatePrices: function() {
-      var self = this;
-      this.stocks.forEach(function(stock) {
+    updatePrices() {
+      this.stocks.forEach(stock => {
         // Record previous price for history
         stock.history.push(stock.price);
         if (stock.history.length > 30) {
@@ -136,12 +134,12 @@ var app = Vue.createApp({
         }
 
         // Calculate new price
-        var volatility = 0.08; // Base volatility
-        var randomFactor = (Math.random() - 0.5) * 2; // Random between -1 and 1
-        var changePercent = randomFactor * volatility;
-        var changeAmount = stock.price * changePercent;
+        const volatility = 0.08; // Base volatility
+        const randomFactor = (Math.random() - 0.5) * 2; // Random between -1 and 1
+        const changePercent = randomFactor * volatility;
+        const changeAmount = stock.price * changePercent;
         
-        var oldPrice = stock.price;
+        const oldPrice = stock.price;
         stock.price = Math.max(1, stock.price + changeAmount);
         stock.change = ((stock.price - oldPrice) / oldPrice) * 100;
       });
@@ -154,20 +152,20 @@ var app = Vue.createApp({
       // Update player's net worth
       this.player.netWorth = this.netWorth;
     },
-    buyStock: function(stock) {
+    buyStock(stock) {
       if (this.player.cash >= stock.price) {
         this.player.cash -= stock.price;
         stock.owned += 1;
       }
     },
-    sellStock: function(stock) {
+    sellStock(stock) {
       if (stock.owned > 0) {
         this.player.cash += stock.price;
         stock.owned -= 1;
       }
     },
-    generateNews: function() {
-      var headlines = [
+    generateNews() {
+      const headlines = [
         { text: '{stock} CEO pays taxes "by accident," promises it won\'t happen again', effect: -0.05 },
         { text: '{stock} unveils product that\'s exactly like their last one but costs more', effect: 0.08 },
         { text: 'Workers at {stock} request livable wages, executives clutch pearls', effect: -0.07 },
@@ -181,18 +179,18 @@ var app = Vue.createApp({
       ];
 
       // Pick a random stock and headline
-      var randomStock = this.stocks[Math.floor(Math.random() * this.stocks.length)];
-      var randomHeadline = headlines[Math.floor(Math.random() * headlines.length)];
+      const randomStock = this.stocks[Math.floor(Math.random() * this.stocks.length)];
+      const randomHeadline = headlines[Math.floor(Math.random() * headlines.length)];
 
       // Apply effect to stock price
-      var effectPercent = randomHeadline.effect;
-      var effectAmount = randomStock.price * effectPercent;
+      const effectPercent = randomHeadline.effect;
+      const effectAmount = randomStock.price * effectPercent;
       randomStock.price = Math.max(1, randomStock.price + effectAmount);
       randomStock.change = effectPercent * 100;
 
       // Add to news items
-      var newsText = randomHeadline.text.replace('{stock}', randomStock.name);
-      var effectText = randomStock.symbol + " " + (effectPercent > 0 ? '+' : '') + (effectPercent * 100).toFixed(1) + "%";
+      const newsText = randomHeadline.text.replace('{stock}', randomStock.name);
+      const effectText = randomStock.symbol + " " + (effectPercent > 0 ? '+' : '') + (effectPercent * 100).toFixed(1) + "%";
       
       this.newsItems.unshift({
         headline: newsText,
@@ -204,7 +202,7 @@ var app = Vue.createApp({
         this.newsItems.pop();
       }
     },
-    buyUpgrade: function(upgrade) {
+    buyUpgrade(upgrade) {
       if (this.player.cash >= upgrade.price && !upgrade.owned) {
         this.player.cash -= upgrade.price;
         upgrade.owned = true;
@@ -213,8 +211,7 @@ var app = Vue.createApp({
         this.applyUpgradeEffects(upgrade);
       }
     },
-    applyUpgradeEffects: function(upgrade) {
-      var self = this;
+    applyUpgradeEffects(upgrade) {
       // Implement different effects based on the upgrade
       switch(upgrade.id) {
         case 1: // Financial Advisor
@@ -225,8 +222,8 @@ var app = Vue.createApp({
           break;
         case 3: // Algorithm Trading Bot
           // Auto-generates small profits each day
-          setInterval(function() {
-            self.player.cash += 500;
+          setInterval(() => {
+            this.player.cash += 500;
           }, 60000); // Once per minute in game time
           break;
         case 4: // Politician in Your Pocket
@@ -240,16 +237,15 @@ var app = Vue.createApp({
           break;
       }
     },
-    saveGame: function() {
+    saveGame() {
       alert("Game saved! (Demo only - this would normally save to a file)");
     },
-    loadGame: function() {
+    loadGame() {
       alert("Game loaded! (Demo only - this would normally load from a file)");
     },
-    startGameLoop: function() {
-      var self = this;
-      this.gameInterval = setInterval(function() {
-        self.updatePrices();
+    startGameLoop() {
+      this.gameInterval = setInterval(() => {
+        this.updatePrices();
       }, 5000); // Update every 5 seconds
     }
   },
@@ -348,11 +344,11 @@ var app = Vue.createApp({
 
 // Register components
 app.component('stock-chart', StockChart);
-/* We'll use direct inclusion in the template instead of separate components for now
+// Explicitly register the Portfolio component for better compatibility
 app.component('portfolio', Portfolio);
+// Register other components
 app.component('news-section', News);
 app.component('upgrade-shop', Upgrades);
-*/
 
 // Mount the app
 app.mount('#app');
