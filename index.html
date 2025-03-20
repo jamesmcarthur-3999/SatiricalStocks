@@ -6,26 +6,21 @@
   <link rel="stylesheet" href="styles/main.css">
   <link rel="stylesheet" href="styles/new-components.css">
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&family=Comic+Neue:wght@700&display=swap">
-  <!-- Direct CDN links for dependencies to avoid local file errors -->
-  <script src="https://unpkg.com/vue@3.2.45/dist/vue.global.prod.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.1.2/dist/chart.umd.min.js"></script>
 </head>
 <body>
   <div id="app">
     <!-- The Vue app will mount here -->
   </div>
 
-  <!-- App scripts -->
+  <!-- Direct CDN links for scripts to avoid dependency issues -->
+  <script src="https://unpkg.com/vue@3.2.45/dist/vue.global.prod.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.1.2/dist/chart.umd.min.js"></script>
+  
+  <!-- App scripts - make sure the order is correct -->
   <script src="src/components/StockChart.js"></script>
   <script src="src/components/Portfolio.js"></script>
   <script src="src/components/News.js"></script>
   <script src="src/components/Upgrades.js"></script>
-  <script src="src/components/TradeQuantitySelector.js"></script>
-  <script src="src/components/MediaManipulationForm.js"></script>
-  <script src="src/components/AchievementsPanel.js"></script>
-  <script src="src/components/TutorialOverlay.js"></script>
-  <script src="src/components/EventLog.js"></script>
-  <script src="src/components/SettingsPanel.js"></script>
   <script src="src/app.js"></script>
 </body>
 </html>
