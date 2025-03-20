@@ -56,7 +56,7 @@ const AchievementsPanel = {
               <div class="achievement-name">{{ achievement.name }}</div>
               <div class="achievement-description">{{ achievement.description }}</div>
               <div class="achievement-reward" v-if="achievement.reward">
-                Reward: ${{ achievement.reward.toLocaleString() }}
+                Reward: \${{ achievement.reward.toLocaleString() }}
               </div>
             </div>
           </div>
