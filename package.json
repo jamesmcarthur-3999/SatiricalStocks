@@ -1,0 +1,48 @@
+{
+  "name": "satirical-stocks",
+  "version": "1.0.0",
+  "description": "A satirical stock market simulation game that pokes fun at wealth hoarding while teaching investment principles",
+  "main": "main.js",
+  "scripts": {
+    "start": "electron .",
+    "build": "electron-builder",
+    "build:win": "electron-builder --win"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/jamesmcarthur-3999/SatiricalStocks.git"
+  },
+  "keywords": [
+    "stock-market",
+    "simulation",
+    "game",
+    "satirical",
+    "electron"
+  ],
+  "author": "jamesmcarthur-3999",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/jamesmcarthur-3999/SatiricalStocks/issues"
+  },
+  "homepage": "https://github.com/jamesmcarthur-3999/SatiricalStocks#readme",
+  "devDependencies": {
+    "electron": "^22.0.0",
+    "electron-builder": "^23.6.0"
+  },
+  "dependencies": {
+    "vue": "^3.2.45",
+    "chart.js": "^4.1.2",
+    "vue-chartjs": "^5.2.0"
+  },
+  "build": {
+    "appId": "com.satiricalstocks.app",
+    "productName": "Satirical Stocks",
+    "win": {
+      "target": "nsis",
+      "icon": "build/icon.ico"
+    },
+    "directories": {
+      "output": "dist"
+    }
+  }
+}
