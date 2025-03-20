@@ -1,11 +1,8 @@
 // Upgrades component
-const Upgrades = {
-  props: {
-    upgrades: Array,
-    playerCash: Number
-  },
+var Upgrades = {
+  props: ['upgrades', 'playerCash'],
   methods: {
-    buyUpgrade(upgrade) {
+    buyUpgrade: function(upgrade) {
       this.$emit('buy-upgrade', upgrade);
     }
   },
