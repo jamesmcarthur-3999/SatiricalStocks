@@ -100,19 +100,18 @@ var StockChart = {
       }
     }
   },
-  template: `
-    <div class="stock-chart">
-      <h2>Market Trends</h2>
-      <div class="stock-selector">
-        <select v-model="selectedStock" @change="updateChart">
-          <option v-for="stock in stocks" :key="stock.id" :value="stock">
-            {{ stock.name }} ({{ stock.symbol }})
-          </option>
-        </select>
-      </div>
-      <div class="chart-container">
-        <canvas ref="stockChart"></canvas>
-      </div>
-    </div>
-  `
+  template: 
+    '<div class="stock-chart">' +
+      '<h2>Market Trends</h2>' +
+      '<div class="stock-selector">' +
+        '<select v-model="selectedStock" @change="updateChart">' +
+          '<option v-for="stock in stocks" :key="stock.id" :value="stock">' +
+            '{{ stock.name }} ({{ stock.symbol }})' +
+          '</option>' +
+        '</select>' +
+      '</div>' +
+      '<div class="chart-container">' +
+        '<canvas ref="stockChart"></canvas>' +
+      '</div>' +
+    '</div>'
 };
