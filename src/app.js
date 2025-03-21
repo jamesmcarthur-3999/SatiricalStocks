@@ -91,6 +91,7 @@ const app = Vue.createApp({
           effect: 'Reduce taxes on profits by 50%'
         }
       ],
+      transactionFee: 0.01, // 1% fee on all transactions
       gameInterval: null
     };
   },
@@ -152,16 +153,52 @@ const app = Vue.createApp({
       // Update player's net worth
       this.player.netWorth = this.netWorth;
     },
-    buyStock(stock) {
-      if (this.player.cash >= stock.price) {
-        this.player.cash -= stock.price;
-        stock.owned += 1;
+    buyStock(stock, quantity = 1) {
+      const totalCost = stock.price * quantity;
+      const transactionCost = totalCost * this.transactionFee;
+      const totalWithFees = totalCost + transactionCost;
+      
+      if (this.player.cash >= totalWithFees) {
+        this.player.cash -= totalWithFees;
+        stock.owned += quantity;
+        
+        // Generate news about large purchases
+        if (quantity >= 50) {
+          this.newsItems.unshift({
+            headline: this.player.name + ' buys ' + quantity + ' shares of ' + stock.name + ' - market takes notice',
+            effect: stock.symbol + ' +1.5%'
+          });
+          
+          // Large purchases slightly increase the stock's price
+          stock.price *= 1.015;
+          if (this.newsItems.length > 5) {
+            this.newsItems.pop();
+          }
+        }
       }
     },
-    sellStock(stock) {
-      if (stock.owned > 0) {
-        this.player.cash += stock.price;
-        stock.owned -= 1;
+    sellStock(stock, quantity = 1) {
+      if (stock.owned >= quantity) {
+        const totalValue = stock.price * quantity;
+        const transactionCost = totalValue * this.transactionFee;
+        const totalAfterFees = totalValue - transactionCost;
+        
+        this.player.cash += totalAfterFees;
+        stock.owned -= quantity;
+        
+        // Generate news about large sales
+        if (quantity >= 50) {
+          this.newsItems.unshift({
+            headline: this.player.name + ' dumps ' + quantity + ' shares of ' + stock.name + ' - investors concerned',
+            effect: stock.symbol + ' -1.5%'
+          });
+          
+          // Large sales slightly decrease the stock's price
+          stock.price *= 0.985;
+          if (this.newsItems.length > 5) {
+            this.newsItems.pop();
+          }
+        }
       }
     },
     generateNews() {
@@ -215,10 +252,31 @@ const app = Vue.createApp({
       // Implement different effects based on the upgrade
       switch(upgrade.id) {
         case 1: // Financial Advisor
-          // Effect implemented in updatePrices() with reduced volatility
+          // Reduce transaction fees
+          this.transactionFee = 0.005; // 0.5% fee instead of 1%
           break;
         case 2: // Insider Trading Friend
           // Will be implemented through occasional tips
+          setInterval(() => {
+            const randomStock = this.stocks[Math.floor(Math.random() * this.stocks.length)];
+            const willGoUp = Math.random() > 0.5;
+            
+            this.newsItems.unshift({
+              headline: 'Your insider friend whispers: "' + randomStock.name + ' will ' + (willGoUp ? 'rise' : 'fall') + ' soon."',
+              effect: 'TIP'
+            });
+            
+            // Schedule the actual change to happen soon
+            setTimeout(() => {
+              const changeAmount = randomStock.price * (willGoUp ? 0.15 : -0.15);
+              randomStock.price = Math.max(1, randomStock.price + changeAmount);
+              randomStock.change = (willGoUp ? 15 : -15);
+            }, 10000); // 10 seconds later
+            
+            if (this.newsItems.length > 5) {
+              this.newsItems.pop();
+            }
+          }, 60000); // Once per minute
           break;
         case 3: // Algorithm Trading Bot
           // Auto-generates small profits each day
@@ -227,13 +285,42 @@ const app = Vue.createApp({
           }, 60000); // Once per minute in game time
           break;
         case 4: // Politician in Your Pocket
-          // Will trigger special news events
+          // Occasional favorable regulation for a random sector
+          setInterval(() => {
+            const sectors = [
+              [1, 7, 9], // Tech sector (TechGiant, SocialMedia, CryptoCorp)
+              [2, 10], // Finance sector (BankCorp, RealEstate)
+              [3, 4], // Energy sector (OilFutures, GreenEnergy)
+              [5, 6, 8] // Consumer sector (FoodChain, LuxuryBrand, MemeStock)
+            ];
+            
+            const randomSector = sectors[Math.floor(Math.random() * sectors.length)];
+            const sectorNames = randomSector.map(id => this.stocks.find(s => s.id === id).name);
+            
+            this.newsItems.unshift({
+              headline: 'New regulation benefits ' + sectorNames.join(', ') + ' - your politician friend delivers',
+              effect: 'SECTOR BOOST'
+            });
+            
+            // Boost all stocks in the sector
+            randomSector.forEach(id => {
+              const stock = this.stocks.find(s => s.id === id);
+              stock.price *= 1.1; // 10% boost
+              stock.change = 10;
+            });
+            
+            if (this.newsItems.length > 5) {
+              this.newsItems.pop();
+            }
+          }, 120000); // Every 2 minutes
           break;
         case 5: // Media Manipulation
-          // Allows player to generate custom news
+          // Add a button to create custom news about a stock
+          // This would normally be implemented through a UI element
           break;
         case 6: // Tax Haven
-          // Reduces tax on profits
+          // Reduces transaction fees to zero
+          this.transactionFee = 0;
           break;
       }
     },
@@ -260,29 +347,13 @@ const app = Vue.createApp({
           '<div class="stock-section">' +
             '<stock-chart :stocks="stocks"></stock-chart>' +
             
-            '<div class="portfolio">' +
-              '<h2>Portfolio</h2>' +
-              '<div class="balance">Cash: ${{ player.cash.toLocaleString() }}</div>' +
-              '<div class="net-worth">Net Worth: ${{ netWorth.toLocaleString() }}</div>' +
-              
-              '<h3>Your Stocks:</h3>' +
-              '<ul class="stock-list">' +
-                '<li v-for="stock in stocks" :key="stock.id" class="stock-item">' +
-                  '<div class="stock-info">' +
-                    '<span class="stock-name">{{ stock.symbol }}</span>' +
-                    '<span class="stock-price">${{ stock.price.toFixed(2) }}</span>' +
-                    '<span class="stock-change" :class="stock.change >= 0 ? \'positive\' : \'negative\'">' +
-                      '{{ stock.change >= 0 ? "+" : "" }}{{ stock.change.toFixed(2) }}%' +
-                    '</span>' +
-                  '</div>' +
-                  '<div class="stock-owned" v-if="stock.owned > 0">Owned: {{ stock.owned }}</div>' +
-                  '<div class="stock-actions">' +
-                    '<button class="btn btn-buy" @click="buyStock(stock)" :disabled="player.cash < stock.price">Buy</button>' +
-                    '<button class="btn btn-sell" @click="sellStock(stock)" :disabled="stock.owned <= 0">Sell</button>' +
-                  '</div>' +
-                '</li>' +
-              '</ul>' +
-            '</div>' +
+            '<portfolio ' +
+              ':player="player" ' +
+              ':stocks="stocks" ' +
+              ':net-worth="netWorth" ' +
+              '@buy-stock="buyStock" ' +
+              '@sell-stock="sellStock"' +
+            '></portfolio>' +
             
             '<div class="news-section">' +
               '<h2 class="news-title">Breaking News</h2>' +
@@ -328,6 +399,11 @@ const app = Vue.createApp({
               '</ul>' +
             '</div>' +
             
+            '<div class="transaction-info">' +
+              '<h3>Transaction Fee: {{ (transactionFee * 100).toFixed(1) }}%</h3>' +
+              '<p>All buy/sell transactions incur this fee.</p>' +
+            '</div>' +
+            
             '<div class="game-controls">' +
               '<button class="btn" @click="saveGame">Save Game</button>' +
               '<button class="btn" @click="loadGame">Load Game</button>' +
@@ -346,6 +422,8 @@ const app = Vue.createApp({
 app.component('stock-chart', StockChart);
 // Explicitly register the Portfolio component for better compatibility
 app.component('portfolio', Portfolio);
+// Register TradeQuantitySelector component
+app.component('trade-quantity-selector', TradeQuantitySelector);
 // Register other components
 app.component('news-section', News);
 app.component('upgrade-shop', Upgrades);
