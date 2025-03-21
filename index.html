@@ -8,6 +8,7 @@
   <link rel="stylesheet" href="styles/new-components.css">
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&family=Comic+Neue:wght@700&display=swap">
   <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>📈</text></svg>">
+  <meta name="description" content="A satirical stock market simulation game that pokes fun at wealth hoarding while teaching investment principles.">
 </head>
 <body>
   <div id="app">
@@ -15,6 +16,7 @@
     <div class="loading-screen">
       <div class="loading-spinner"></div>
       <div class="loading-text">Loading Satirical Stocks...</div>
+      <div class="loading-quote">"The market can remain irrational longer than you can remain solvent." — John Maynard Keynes</div>
     </div>
   </div>
 
@@ -32,6 +34,9 @@
   <script src="src/components/NotificationSystem.js"></script>
   <script src="src/components/GameControls.js"></script>
   <script src="src/components/IntroScreen.js"></script>
+  <script src="src/components/StockDetails.js"></script>
+  <script src="src/components/MarketEvents.js"></script>
+  <script src="src/components/TutorialSystem.js"></script>
   <script src="src/app.js"></script>
 
   <style>
@@ -63,6 +68,15 @@
     
     .loading-text {
       font-size: 24px;
+      margin-bottom: 10px;
+    }
+    
+    .loading-quote {
+      font-size: 14px;
+      font-style: italic;
+      max-width: 80%;
+      text-align: center;
+      opacity: 0.8;
     }
     
     @keyframes spin {
