@@ -856,3 +856,643 @@
 .sector-consumer::before {
   content: "🛒";
 }
+
+/* Stock Details Modal */
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.7);
+  z-index: 10000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow-y: auto;
+}
+
+.modal-content {
+  background-color: white;
+  width: 90%;
+  max-width: 900px;
+  border-radius: 10px;
+  box-shadow: 0 5px 20px rgba(0, 0, 0, 0.3);
+  overflow: hidden;
+  max-height: 90vh;
+  display: flex;
+  flex-direction: column;
+}
+
+.modal-header {
+  padding: 20px;
+  background-color: #f8f9fa;
+  border-bottom: 1px solid #eee;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.stock-header-info {
+  flex: 1;
+}
+
+.stock-sector-badge {
+  display: inline-block;
+  padding: 3px 10px;
+  background-color: #e3f2fd;
+  border-radius: 15px;
+  margin-bottom: 5px;
+  font-size: 14px;
+}
+
+.modal-header h2 {
+  margin: 0;
+  font-size: 24px;
+}
+
+.stock-price-info {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-top: 5px;
+}
+
+.stock-current-price {
+  font-size: 24px;
+  font-weight: bold;
+}
+
+.stock-price-change {
+  font-size: 16px;
+}
+
+.stock-price-change.positive {
+  color: #4caf50;
+}
+
+.stock-price-change.negative {
+  color: #f44336;
+}
+
+.stock-price-change.strong-positive {
+  color: #4caf50;
+  font-weight: bold;
+}
+
+.stock-price-change.strong-negative {
+  color: #f44336;
+  font-weight: bold;
+}
+
+.modal-close {
+  background: none;
+  border: none;
+  font-size: 24px;
+  cursor: pointer;
+  color: #666;
+}
+
+.modal-tabs {
+  display: flex;
+  background-color: #f0f2f5;
+  border-bottom: 1px solid #ddd;
+}
+
+.tab-button {
+  padding: 12px 20px;
+  background: none;
+  border: none;
+  border-bottom: 3px solid transparent;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 500;
+  transition: all 0.2s;
+}
+
+.tab-button:hover {
+  background-color: #e3e3e3;
+}
+
+.tab-button.active {
+  border-bottom-color: #1e88e5;
+  color: #1e88e5;
+}
+
+.modal-body {
+  padding: 20px;
+  overflow-y: auto;
+  flex: 1;
+}
+
+.tab-content {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 20px;
+}
+
+.company-overview, .trading-panel {
+  flex: 1;
+  min-width: 300px;
+}
+
+.company-description {
+  background-color: #f9f9f9;
+  padding: 15px;
+  border-radius: 5px;
+  margin-bottom: 20px;
+}
+
+.company-fact {
+  margin-top: 15px;
+  font-style: italic;
+  border-left: 3px solid #ddd;
+  padding-left: 10px;
+}
+
+.market-position {
+  margin-bottom: 20px;
+}
+
+.position-item {
+  display: flex;
+  justify-content: space-between;
+  padding: 8px 0;
+  border-bottom: 1px solid #eee;
+}
+
+.position-label {
+  font-weight: bold;
+}
+
+.trading-panel {
+  background-color: #f5f5f5;
+  padding: 15px;
+  border-radius: 5px;
+}
+
+.trade-preview {
+  margin: 15px 0;
+  padding: 10px;
+  background-color: white;
+  border-radius: 5px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.preview-purchase, .preview-sale {
+  padding: 8px 0;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+}
+
+.preview-purchase {
+  border-bottom: 1px dashed #ddd;
+}
+
+.preview-label {
+  width: 40%;
+  font-weight: bold;
+}
+
+.preview-value {
+  width: 60%;
+  text-align: right;
+  font-weight: bold;
+}
+
+.preview-note {
+  width: 100%;
+  font-size: 12px;
+  color: #666;
+  margin-top: 3px;
+  text-align: right;
+}
+
+.trade-buttons {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 15px;
+}
+
+.trade-buttons button {
+  flex: 1;
+}
+
+.holdings-info {
+  background-color: white;
+  padding: 10px;
+  border-radius: 5px;
+  margin-top: 15px;
+  text-align: center;
+}
+
+.holdings-label {
+  font-weight: bold;
+  margin-bottom: 5px;
+}
+
+.holdings-value {
+  font-size: 18px;
+  margin: 5px 0;
+}
+
+.chart-container {
+  width: 100%;
+  height: 300px;
+  margin-bottom: 20px;
+}
+
+.technical-indicators, .analyst-recommendations {
+  flex: 1;
+  min-width: 300px;
+}
+
+.indicator-item, .recommendation-item {
+  padding: 10px;
+  background-color: #f5f5f5;
+  border-radius: 5px;
+  margin-bottom: 10px;
+  display: flex;
+  justify-content: space-between;
+}
+
+.recommendation-item {
+  padding: 15px;
+}
+
+.indicator-name, .recommendation-rating {
+  font-weight: bold;
+}
+
+.recommendation-source {
+  font-size: 12px;
+  color: #666;
+}
+
+.financial-metrics {
+  width: 100%;
+  margin-bottom: 20px;
+}
+
+.metric-item {
+  display: flex;
+  justify-content: space-between;
+  padding: 10px;
+  border-bottom: 1px solid #eee;
+}
+
+.metric-name {
+  font-weight: bold;
+}
+
+.satirical-financials {
+  background-color: #f5f5f5;
+  padding: 15px;
+  border-radius: 5px;
+}
+
+.notes-list {
+  margin: 10px 0 0 20px;
+  padding: 0;
+}
+
+.notes-list li {
+  margin-bottom: 8px;
+}
+
+/* Market Events */
+.event-modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.8);
+  z-index: 10001;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.event-modal {
+  background-color: white;
+  width: 90%;
+  max-width: 500px;
+  border-radius: 10px;
+  overflow: hidden;
+  animation: event-modal-appear 0.5s ease-out;
+}
+
+@keyframes event-modal-appear {
+  from {
+    transform: scale(0.7);
+    opacity: 0;
+  }
+  to {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+.event-modal-header {
+  background-color: #f44336;
+  color: white;
+  padding: 15px 20px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.event-modal-header h2 {
+  margin: 0;
+  font-size: 22px;
+}
+
+.event-modal-body {
+  padding: 20px;
+}
+
+.event-description {
+  font-size: 16px;
+  line-height: 1.5;
+  margin-bottom: 20px;
+}
+
+.event-duration {
+  font-size: 14px;
+  color: #666;
+  font-style: italic;
+}
+
+/* Tutorial System */
+.tutorial-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.7);
+  z-index: 10002;
+  pointer-events: none;
+}
+
+.tutorial-tooltip {
+  position: fixed;
+  background-color: white;
+  padding: 20px;
+  border-radius: 5px;
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+  width: 300px;
+  max-width: 90vw;
+  z-index: 10003;
+  pointer-events: auto;
+}
+
+.tutorial-arrow {
+  position: absolute;
+  width: 0;
+  height: 0;
+  border-style: solid;
+  border-width: 10px;
+  border-color: white transparent transparent transparent;
+}
+
+.tutorial-header {
+  margin-bottom: 15px;
+  border-bottom: 1px solid #eee;
+  padding-bottom: 10px;
+}
+
+.tutorial-title {
+  margin: 0 0 5px 0;
+  font-size: 18px;
+  color: #1e88e5;
+}
+
+.tutorial-step-counter {
+  font-size: 12px;
+  color: #666;
+}
+
+.tutorial-content {
+  margin-bottom: 20px;
+}
+
+.tutorial-content p {
+  margin: 0;
+  line-height: 1.5;
+}
+
+.tutorial-controls {
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.tutorial-btn {
+  padding: 8px 12px;
+  border: none;
+  border-radius: 3px;
+  cursor: pointer;
+  font-size: 14px;
+}
+
+.tutorial-prev {
+  background-color: #f5f5f5;
+  color: #333;
+}
+
+.tutorial-next {
+  background-color: #1e88e5;
+  color: white;
+}
+
+.tutorial-skip {
+  background-color: transparent;
+  color: #666;
+  text-decoration: underline;
+}
+
+.tutorial-trigger-btn {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  background-color: #1e88e5;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  padding: 10px 15px;
+  font-size: 14px;
+  cursor: pointer;
+  z-index: 9000;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+}
+
+.tutorial-highlight {
+  position: relative;
+  z-index: 10001;
+  box-shadow: 0 0 0 4px rgba(30, 136, 229, 0.5), 0 0 0 8px rgba(255, 255, 255, 0.5);
+  border-radius: 3px;
+  transition: box-shadow 0.3s;
+  animation: highlight-pulse 1.5s infinite;
+}
+
+@keyframes highlight-pulse {
+  0%, 100% {
+    box-shadow: 0 0 0 4px rgba(30, 136, 229, 0.5), 0 0 0 8px rgba(255, 255, 255, 0.5);
+  }
+  50% {
+    box-shadow: 0 0 0 8px rgba(30, 136, 229, 0.5), 0 0 0 12px rgba(255, 255, 255, 0.5);
+  }
+}
+
+/* Transitions */
+.fade-enter-active, .fade-leave-active {
+  transition: opacity 0.3s;
+}
+
+.fade-enter-from, .fade-leave-to {
+  opacity: 0;
+}
+
+.modal-enter-active, .modal-leave-active {
+  transition: opacity 0.3s;
+}
+
+.modal-enter-from, .modal-leave-to {
+  opacity: 0;
+}
+
+.shake-animation {
+  animation: shake 0.5s cubic-bezier(.36,.07,.19,.97) both;
+}
+
+@keyframes shake {
+  10%, 90% {
+    transform: translate3d(-1px, 0, 0);
+  }
+  20%, 80% {
+    transform: translate3d(2px, 0, 0);
+  }
+  30%, 50%, 70% {
+    transform: translate3d(-4px, 0, 0);
+  }
+  40%, 60% {
+    transform: translate3d(4px, 0, 0);
+  }
+}
+
+/* Stock List Enhancements */
+.stock-list .stock-item {
+  border: 1px solid #eee;
+  border-radius: 8px;
+  margin-bottom: 10px;
+  padding: 12px;
+  transition: transform 0.2s, box-shadow 0.2s;
+  cursor: pointer;
+}
+
+.stock-list .stock-item:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+}
+
+.stock-name {
+  font-size: 16px;
+  display: flex;
+  align-items: center;
+}
+
+.stock-sector-tag {
+  display: inline-block;
+  font-size: 12px;
+  padding: 2px 6px;
+  border-radius: 3px;
+  margin-left: 5px;
+  background-color: #f0f0f0;
+}
+
+.tech-tag {
+  background-color: #e3f2fd;
+  color: #1565c0;
+}
+
+.finance-tag {
+  background-color: #e8f5e9;
+  color: #2e7d32;
+}
+
+.energy-tag {
+  background-color: #fff8e1;
+  color: #ff8f00;
+}
+
+.consumer-tag {
+  background-color: #f3e5f5;
+  color: #6a1b9a;
+}
+
+/* Game Settings Panel */
+.settings-panel {
+  background-color: white;
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 90%;
+  max-width: 500px;
+  border-radius: 10px;
+  box-shadow: 0 5px 20px rgba(0, 0, 0, 0.3);
+  padding: 20px;
+  z-index: 10000;
+}
+
+.settings-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+  padding-bottom: 10px;
+  border-bottom: 1px solid #eee;
+}
+
+.settings-header h2 {
+  margin: 0;
+  font-size: 20px;
+}
+
+.settings-close {
+  background: none;
+  border: none;
+  font-size: 20px;
+  cursor: pointer;
+  color: #666;
+}
+
+.settings-section {
+  margin-bottom: 20px;
+}
+
+.settings-section h3 {
+  margin: 0 0 10px 0;
+  font-size: 16px;
+  color: #333;
+}
+
+.settings-option {
+  display: flex;
+  align-items: center;
+  padding: 8px 0;
+}
+
+.settings-option label {
+  margin-left: 10px;
+}
+
+.settings-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  margin-top: 20px;
+}
