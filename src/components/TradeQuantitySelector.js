@@ -1,41 +1,29 @@
 // Trade Quantity Selector component
-const TradeQuantitySelector = {
-  props: {
-    value: {
-      type: Number,
-      default: 1
-    },
-    presets: {
-      type: Array,
-      default: () => [1, 5, 10, 25, 100]
-    },
-    maxQuantity: {
-      type: Number,
-      default: null
-    }
-  },
-  data() {
+var TradeQuantitySelector = {
+  props: ['value', 'maxQuantity'],
+  data: function() {
     return {
-      customQuantity: ""
+      customQuantity: "",
+      presets: [1, 5, 10, 25, 100]
     };
   },
   methods: {
-    selectPreset(quantity) {
+    selectPreset: function(quantity) {
       // If a max is provided, ensure we don't exceed it
-      const actualQuantity = this.maxQuantity !== null ? 
+      var actualQuantity = this.maxQuantity !== null ? 
         Math.min(quantity, this.maxQuantity) : quantity;
         
-      this.$emit('update:value', actualQuantity);
+      this.$emit('update', actualQuantity);
       this.customQuantity = "";
     },
-    setCustomQuantity() {
-      const value = parseInt(this.customQuantity);
+    setCustomQuantity: function() {
+      var value = parseInt(this.customQuantity);
       if (!isNaN(value) && value > 0) {
         // If a max is provided, ensure we don't exceed it
-        const actualQuantity = this.maxQuantity !== null ? 
+        var actualQuantity = this.maxQuantity !== null ? 
           Math.min(value, this.maxQuantity) : value;
           
-        this.$emit('update:value', actualQuantity);
+        this.$emit('update', actualQuantity);
         
         // If we capped the value, update the input
         if (this.maxQuantity !== null && value > this.maxQuantity) {
@@ -49,8 +37,7 @@ const TradeQuantitySelector = {
   },
   template: `
     <div class="trade-quantity-selector">
-      <div class="quantity-label">Quantity:</div>
-      <div class="quantity-display">{{ value }}</div>
+      <div class="quantity-label">Quantity: <strong>{{ value }}</strong></div>
       
       <div class="quantity-presets">
         <button 
