@@ -32,6 +32,8 @@ const app = Vue.createApp({
         "Look for news that affects specific stocks or entire sectors.",
         "Diversifying across different sectors can help manage risk."
       ],
+      showSettingsPanel: false,
+      selectedStockId: null,
       
       // Player data
       player: {
@@ -153,10 +155,20 @@ const app = Vue.createApp({
         { id: 8, name: 'Market Crash Survivor', description: 'Keep a positive net worth during a market crash', achieved: false }
       ],
       
+      // Game settings
+      settings: {
+        soundEffects: true,
+        showTutorial: true,
+        showHints: true,
+        darkMode: false,
+        animationSpeed: 'normal'
+      },
+      
       // Intervals
       gameInterval: null,
       timeInterval: null,
-      tipInterval: null
+      tipInterval: null,
+      eventInterval: null
     };
   },
   computed: {
@@ -187,6 +199,14 @@ const app = Vue.createApp({
     },
     isMarketHours() {
       return this.gameTime.hour >= this.marketHours.open && this.gameTime.hour < this.marketHours.close;
+    },
+    selectedStock() {
+      if (!this.selectedStockId) return null;
+      return this.stocks.find(stock => stock.id === this.selectedStockId);
+    },
+    selectedStockSector() {
+      if (!this.selectedStock) return null;
+      return this.sectors[this.selectedStock.sector];
     }
   },
   watch: {
@@ -237,12 +257,21 @@ const app = Vue.createApp({
       // Start game loops
       this.startGameLoop();
       this.startTimeLoop();
+      this.startEventLoop();
       
       // Start showing tips if enabled
       if (this.showTips) {
         this.startTipLoop();
         // Show first tip immediately
         this.$refs.notifications.showTip(this.tips[0]);
+      }
+      
+      // Automatically start tutorial if settings say so
+      if (this.settings.showTutorial) {
+        // Give a brief delay to let the game load completely
+        setTimeout(() => {
+          this.$refs.tutorial.startTutorial();
+        }, 3000);
       }
       
       // Welcome notification
@@ -566,6 +595,8 @@ const app = Vue.createApp({
         case 2: // Insider Trading Friend
           // Will be implemented through occasional tips
           setInterval(() => {
+            if (this.isPaused) return;
+            
             const randomStock = this.stocks[Math.floor(Math.random() * this.stocks.length)];
             const willGoUp = Math.random() > 0.5;
             
@@ -580,6 +611,8 @@ const app = Vue.createApp({
             
             // Schedule the actual change to happen soon
             setTimeout(() => {
+              if (this.isPaused) return;
+              
               const changeAmount = randomStock.price * (willGoUp ? 0.15 : -0.15);
               randomStock.price = Math.max(1, randomStock.price + changeAmount);
               randomStock.change = (willGoUp ? 15 : -15);
@@ -700,7 +733,24 @@ const app = Vue.createApp({
       this.$refs.notifications.showSuccess('Game loaded! (Demo only)', 'Load Game');
     },
     openSettings() {
-      this.$refs.notifications.showAlert('Settings would open here', 'Settings');
+      this.showSettingsPanel = true;
+    },
+    closeSettings() {
+      this.showSettingsPanel = false;
+    },
+    saveSettings() {
+      this.closeSettings();
+      this.$refs.notifications.showSuccess('Settings saved!', 'Settings');
+    },
+    viewStockDetails(stockId) {
+      this.selectedStockId = stockId;
+      this.$refs.stockDetails.show();
+    },
+    triggerMarketEvent(eventId) {
+      this.$refs.marketEvents.triggerSpecificEvent(eventId, this);
+    },
+    triggerRandomMarketEvent() {
+      this.$refs.marketEvents.triggerRandomEvent(this);
     },
     startGameLoop() {
       const baseInterval = 5000; // 5 seconds base interval
@@ -719,6 +769,21 @@ const app = Vue.createApp({
       this.tipInterval = setInterval(() => {
         this.showNextTip();
       }, 120000); // Show a tip every 2 minutes
+    },
+    startEventLoop() {
+      // Random market events
+      this.eventInterval = setInterval(() => {
+        if (!this.isPaused && this.marketOpen && Math.random() < 0.1) { // 10% chance every 3 minutes
+          this.triggerRandomMarketEvent();
+        }
+      }, 180000); // Check every 3 minutes
+    },
+    onTutorialStarted() {
+      this.isPaused = true;
+    },
+    onTutorialEnded() {
+      this.isPaused = false;
+      this.$refs.notifications.showSuccess('Tutorial completed! You\'re ready to start trading.', 'Tutorial');
     }
   },
   beforeUnmount() {
@@ -726,6 +791,7 @@ const app = Vue.createApp({
     clearInterval(this.gameInterval);
     clearInterval(this.timeInterval);
     clearInterval(this.tipInterval);
+    clearInterval(this.eventInterval);
   },
   template: 
     '<div class="game-container">' +
@@ -793,7 +859,10 @@ const app = Vue.createApp({
                 
                 '<div class="sector-indicators">' +
                   '<div v-for="(sector, key) in sectors" :key="key" class="sector-indicator">' +
-                    '<div class="indicator-label">{{ sector.name }}:</div>' +
+                    '<div class="indicator-label">' +
+                      '<span class="sector-icon" :class="\'sector-\' + key"></span>' +
+                      '{{ sector.name }}:' +
+                    '</div>' +
                     '<div class="indicator-bar">' +
                       '<div class="indicator-value" :style="{ width: ((sector.trend + 1) * 50) + \'%\', backgroundColor: sector.trend >= 0 ? \'#4caf50\' : \'#f44336\' }"></div>' +
                     '</div>' +
@@ -803,6 +872,29 @@ const app = Vue.createApp({
                     '</div>' +
                   '</div>' +
                 '</div>' +
+              '</div>' +
+              
+              '<div class="stock-list-enhanced">' +
+                '<h2 class="stocks-title">Stock Details</h2>' +
+                '<ul class="stock-list">' +
+                  '<li v-for="stock in stocks" :key="stock.id" ' +
+                      'class="stock-item" ' +
+                      '@click="viewStockDetails(stock.id)">' +
+                    '<div class="stock-info">' +
+                      '<span class="stock-name">' +
+                        '<span class="sector-icon" :class="\'sector-\' + stock.sector"></span>' +
+                        '{{ stock.name }} ({{ stock.symbol }})' +
+                        '<span class="stock-sector-tag" :class="stock.sector + \'-tag\'">{{ sectors[stock.sector].name }}</span>' +
+                      '</span>' +
+                      '<span class="stock-price" :class="stock.priceChangeClass">${{ stock.price.toFixed(2) }}</span>' +
+                      '<span class="stock-change" :class="stock.change >= 0 ? \'positive\' : \'negative\'">' +
+                        '{{ stock.change >= 0 ? "+" : "" }}{{ stock.change.toFixed(2) }}%' +
+                      '</span>' +
+                    '</div>' +
+                    '<div class="stock-owned" v-if="stock.owned > 0">Owned: {{ stock.owned }}</div>' +
+                    '<div class="stock-details-link">View Details</div>' +
+                  '</li>' +
+                '</ul>' +
               '</div>' +
             '</div>' +
             
@@ -873,7 +965,79 @@ const app = Vue.createApp({
           '<p>Satirical Stocks &copy; 2025 - Remember, it\'s just a game... unlike real wealth inequality!</p>' +
         '</footer>' +
         
+        '<!-- Additional UI elements -->' +
+        '<stock-details ' +
+          'ref="stockDetails" ' +
+          ':stock="selectedStock" ' +
+          ':sector="selectedStockSector" ' +
+          ':transaction-fee="transactionFee" ' +
+          ':player-cash="player.cash" ' +
+          '@buy-stock="buyStock" ' +
+          '@sell-stock="sellStock"' +
+        '></stock-details>' +
+        
+        '<market-events ref="marketEvents"></market-events>' +
+        
         '<notification-system ref="notifications"></notification-system>' +
+        
+        '<tutorial-system ' +
+          'ref="tutorial" ' +
+          '@tutorial-started="onTutorialStarted" ' +
+          '@tutorial-ended="onTutorialEnded"' +
+        '></tutorial-system>' +
+        
+        '<!-- Settings Panel -->' +
+        '<transition name="modal">' +
+          '<div v-if="showSettingsPanel" class="modal-overlay" @click="closeSettings">' +
+            '<div class="settings-panel" @click.stop>' +
+              '<div class="settings-header">' +
+                '<h2>Game Settings</h2>' +
+                '<button class="settings-close" @click="closeSettings">&times;</button>' +
+              '</div>' +
+              
+              '<div class="settings-section">' +
+                '<h3>Display Options</h3>' +
+                '<div class="settings-option">' +
+                  '<input type="checkbox" id="show-tutorial" v-model="settings.showTutorial">' +
+                  '<label for="show-tutorial">Show tutorial on game start</label>' +
+                '</div>' +
+                '<div class="settings-option">' +
+                  '<input type="checkbox" id="show-hints" v-model="settings.showHints">' +
+                  '<label for="show-hints">Show gameplay hints</label>' +
+                '</div>' +
+                '<div class="settings-option">' +
+                  '<input type="checkbox" id="dark-mode" v-model="settings.darkMode">' +
+                  '<label for="dark-mode">Dark mode (coming soon)</label>' +
+                '</div>' +
+              '</div>' +
+              
+              '<div class="settings-section">' +
+                '<h3>Sound Options</h3>' +
+                '<div class="settings-option">' +
+                  '<input type="checkbox" id="sound-effects" v-model="settings.soundEffects">' +
+                  '<label for="sound-effects">Sound effects (coming soon)</label>' +
+                '</div>' +
+              '</div>' +
+              
+              '<div class="settings-section">' +
+                '<h3>Animation Speed</h3>' +
+                '<div class="settings-option">' +
+                  '<select v-model="settings.animationSpeed">' +
+                    '<option value="slow">Slow</option>' +
+                    '<option value="normal">Normal</option>' +
+                    '<option value="fast">Fast</option>' +
+                    '<option value="none">No animations</option>' +
+                  '</select>' +
+                '</div>' +
+              '</div>' +
+              
+              '<div class="settings-actions">' +
+                '<button class="btn btn-secondary" @click="closeSettings">Cancel</button>' +
+                '<button class="btn btn-primary" @click="saveSettings">Save Settings</button>' +
+              '</div>' +
+            '</div>' +
+          '</div>' +
+        '</transition>' +
       '</template>' +
     '</div>'
 });
@@ -886,6 +1050,9 @@ app.component('tooltip', Tooltip);
 app.component('notification-system', NotificationSystem);
 app.component('game-controls', GameControls);
 app.component('intro-screen', IntroScreen);
+app.component('stock-details', StockDetails);
+app.component('market-events', MarketEvents);
+app.component('tutorial-system', TutorialSystem);
 
 // Mount the app
 app.mount('#app');
