@@ -23,17 +23,25 @@ const app = Vue.createApp({
         ]
       },
       stocks: [
-        { id: 1, name: 'TechGiant', symbol: 'TG', price: 150, change: 0, history: [], owned: 0 },
-        { id: 2, name: 'BankCorp', symbol: 'BC', price: 80, change: 0, history: [], owned: 0 },
-        { id: 3, name: 'OilFutures', symbol: 'OF', price: 65, change: 0, history: [], owned: 0 },
-        { id: 4, name: 'GreenEnergy', symbol: 'GE', price: 45, change: 0, history: [], owned: 0 },
-        { id: 5, name: 'FoodChain', symbol: 'FC', price: 30, change: 0, history: [], owned: 0 },
-        { id: 6, name: 'LuxuryBrand', symbol: 'LB', price: 120, change: 0, history: [], owned: 0 },
-        { id: 7, name: 'SocialMedia', symbol: 'SM', price: 90, change: 0, history: [], owned: 0 },
-        { id: 8, name: 'MemeStock', symbol: 'MS', price: 10, change: 0, history: [], owned: 0 },
-        { id: 9, name: 'CryptoCorp', symbol: 'CC', price: 35, change: 0, history: [], owned: 0 },
-        { id: 10, name: 'RealEstate', symbol: 'RE', price: 70, change: 0, history: [], owned: 0 }
+        { id: 1, name: 'TechGiant', symbol: 'TG', price: 150, change: 0, history: [], owned: 0, sector: 'tech' },
+        { id: 2, name: 'BankCorp', symbol: 'BC', price: 80, change: 0, history: [], owned: 0, sector: 'finance' },
+        { id: 3, name: 'OilFutures', symbol: 'OF', price: 65, change: 0, history: [], owned: 0, sector: 'energy' },
+        { id: 4, name: 'GreenEnergy', symbol: 'GE', price: 45, change: 0, history: [], owned: 0, sector: 'energy' },
+        { id: 5, name: 'FoodChain', symbol: 'FC', price: 30, change: 0, history: [], owned: 0, sector: 'consumer' },
+        { id: 6, name: 'LuxuryBrand', symbol: 'LB', price: 120, change: 0, history: [], owned: 0, sector: 'consumer' },
+        { id: 7, name: 'SocialMedia', symbol: 'SM', price: 90, change: 0, history: [], owned: 0, sector: 'tech' },
+        { id: 8, name: 'MemeStock', symbol: 'MS', price: 10, change: 0, history: [], owned: 0, sector: 'consumer' },
+        { id: 9, name: 'CryptoCorp', symbol: 'CC', price: 35, change: 0, history: [], owned: 0, sector: 'tech' },
+        { id: 10, name: 'RealEstate', symbol: 'RE', price: 70, change: 0, history: [], owned: 0, sector: 'finance' }
       ],
+      sectors: {
+        tech: { trend: 0, volatility: 0.15, name: 'Technology' },
+        finance: { trend: 0, volatility: 0.10, name: 'Finance' },
+        energy: { trend: 0, volatility: 0.12, name: 'Energy' },
+        consumer: { trend: 0, volatility: 0.08, name: 'Consumer' }
+      },
+      marketTrend: 0, // -1 to 1, representing market direction
+      marketCycle: 0, // Counter for market cycles
       newsItems: [
         { headline: 'TechGiant announces new AI assistant that reads your thoughts', effect: 'TechGiant +5%' },
         { headline: 'BankCorp CEO caught using company funds for gold-plated toilet', effect: 'BankCorp -8%' },
@@ -92,6 +100,16 @@ const app = Vue.createApp({
         }
       ],
       transactionFee: 0.01, // 1% fee on all transactions
+      achievements: [
+        { id: 1, name: 'First Trade', description: 'Buy your first stock', achieved: false },
+        { id: 2, name: 'Portfolio Diversity', description: 'Own at least 5 different stocks', achieved: false },
+        { id: 3, name: 'Penny Pincher', description: 'Make a profit on a stock under $20', achieved: false },
+        { id: 4, name: 'Big Spender', description: 'Buy 100 shares at once', achieved: false },
+        { id: 5, name: 'Market Manipulator', description: 'Own more than 50% of one company', achieved: false },
+        { id: 6, name: 'Millionaire', description: 'Reach a net worth of $1,000,000', achieved: false },
+        { id: 7, name: 'Sector Specialist', description: 'Own all stocks in one sector', achieved: false },
+        { id: 8, name: 'Market Crash Survivor', description: 'Keep a positive net worth during a market crash', achieved: false }
+      ],
       gameInterval: null
     };
   },
@@ -111,6 +129,15 @@ const app = Vue.createApp({
     wealthStatus() {
       const level = Math.min(Math.floor(this.wealthPercentile * this.player.wealthStatusMessages.length / 100), this.player.wealthStatusMessages.length - 1);
       return this.player.wealthStatusMessages[level];
+    },
+    stocksBySector() {
+      const result = {};
+      
+      for (const sectorKey in this.sectors) {
+        result[sectorKey] = this.stocks.filter(stock => stock.sector === sectorKey);
+      }
+      
+      return result;
     }
   },
   mounted() {
@@ -122,11 +149,52 @@ const app = Vue.createApp({
       });
     });
     
+    // Initialize market cycle
+    this.updateMarketTrend();
+    
     // Start game loop
     this.startGameLoop();
   },
   methods: {
+    updateMarketTrend() {
+      // Update the overall market trend (cycles between bull and bear markets)
+      this.marketCycle += 0.05;
+      // Sine wave between -1 and 1 with random noise
+      this.marketTrend = (Math.sin(this.marketCycle) * 0.8) + (Math.random() * 0.4 - 0.2);
+      
+      // Update sector trends based on market trend with some divergence
+      for (const sectorKey in this.sectors) {
+        const sector = this.sectors[sectorKey];
+        // Each sector follows the market with some random divergence
+        const divergence = (Math.random() * 0.6) - 0.3; // -0.3 to 0.3
+        sector.trend = this.marketTrend + divergence;
+        // Clamp to reasonable values
+        sector.trend = Math.max(-1, Math.min(1, sector.trend));
+      }
+      
+      // Generate market-wide news at certain thresholds
+      if (this.marketTrend > 0.7 && Math.random() < 0.3) {
+        this.newsItems.unshift({
+          headline: 'Market surges on optimistic economic outlook - all sectors up',
+          effect: 'MARKET +5%'
+        });
+        // Trim news items
+        if (this.newsItems.length > 5) this.newsItems.pop();
+      } else if (this.marketTrend < -0.7 && Math.random() < 0.3) {
+        this.newsItems.unshift({
+          headline: 'Market plunges amid recession fears - investors in panic',
+          effect: 'MARKET -5%'
+        });
+        // Trim news items
+        if (this.newsItems.length > 5) this.newsItems.pop();
+      }
+    },
     updatePrices() {
+      // Occasionally update the market trends (every ~5 cycles)
+      if (Math.random() < 0.2) {
+        this.updateMarketTrend();
+      }
+      
       this.stocks.forEach(stock => {
         // Record previous price for history
         stock.history.push(stock.price);
@@ -134,12 +202,31 @@ const app = Vue.createApp({
           stock.history.shift();
         }
 
-        // Calculate new price
-        const volatility = 0.08; // Base volatility
-        const randomFactor = (Math.random() - 0.5) * 2; // Random between -1 and 1
-        const changePercent = randomFactor * volatility;
+        // Calculate new price based on:
+        // 1. Overall market trend
+        // 2. Sector-specific trend
+        // 3. Stock-specific random component
+        
+        const sector = this.sectors[stock.sector];
+        
+        // Base volatility from sector
+        const volatility = sector.volatility;
+        
+        // Market influence (30%)
+        const marketInfluence = this.marketTrend * 0.03; // ±3% from market
+        
+        // Sector influence (40%)
+        const sectorInfluence = sector.trend * 0.04; // ±4% from sector
+        
+        // Stock-specific randomness (30%)
+        const randomFactor = (Math.random() - 0.5) * 2; // -1 to 1
+        const randomInfluence = randomFactor * volatility * 0.03; // ±3% randomness based on sector volatility
+        
+        // Calculate overall change percentage
+        const changePercent = marketInfluence + sectorInfluence + randomInfluence;
         const changeAmount = stock.price * changePercent;
         
+        // Apply change to price
         const oldPrice = stock.price;
         stock.price = Math.max(1, stock.price + changeAmount);
         stock.change = ((stock.price - oldPrice) / oldPrice) * 100;
@@ -152,6 +239,9 @@ const app = Vue.createApp({
 
       // Update player's net worth
       this.player.netWorth = this.netWorth;
+      
+      // Check for achievements
+      this.checkAchievements();
     },
     buyStock(stock, quantity = 1) {
       const totalCost = stock.price * quantity;
@@ -174,6 +264,18 @@ const app = Vue.createApp({
           if (this.newsItems.length > 5) {
             this.newsItems.pop();
           }
+        }
+        
+        // First purchase achievement
+        if (!this.achievements[0].achieved) {
+          this.achievements[0].achieved = true;
+          this.showAchievementNotification(this.achievements[0]);
+        }
+        
+        // Big spender achievement
+        if (quantity >= 100 && !this.achievements[3].achieved) {
+          this.achievements[3].achieved = true;
+          this.showAchievementNotification(this.achievements[3]);
         }
       }
     },
@@ -198,6 +300,12 @@ const app = Vue.createApp({
           if (this.newsItems.length > 5) {
             this.newsItems.pop();
           }
+        }
+        
+        // Check penny pincher achievement
+        if (stock.price < 20 && stock.change > 0 && !this.achievements[2].achieved) {
+          this.achievements[2].achieved = true;
+          this.showAchievementNotification(this.achievements[2]);
         }
       }
     },
@@ -238,6 +346,58 @@ const app = Vue.createApp({
       if (this.newsItems.length > 5) {
         this.newsItems.pop();
       }
+    },
+    checkAchievements() {
+      // Portfolio diversity achievement
+      if (!this.achievements[1].achieved) {
+        const uniqueStocksOwned = this.stocks.filter(stock => stock.owned > 0).length;
+        if (uniqueStocksOwned >= 5) {
+          this.achievements[1].achieved = true;
+          this.showAchievementNotification(this.achievements[1]);
+        }
+      }
+      
+      // Market manipulator achievement
+      if (!this.achievements[4].achieved) {
+        const marketManipulator = this.stocks.some(stock => {
+          // Let's say total shares per company is 1000 for simplicity
+          return (stock.owned / 1000) > 0.5;
+        });
+        
+        if (marketManipulator) {
+          this.achievements[4].achieved = true;
+          this.showAchievementNotification(this.achievements[4]);
+        }
+      }
+      
+      // Millionaire achievement
+      if (!this.achievements[5].achieved && this.netWorth >= 1000000) {
+        this.achievements[5].achieved = true;
+        this.showAchievementNotification(this.achievements[5]);
+      }
+      
+      // Sector specialist achievement
+      if (!this.achievements[6].achieved) {
+        for (const sectorKey in this.stocksBySector) {
+          const sectorStocks = this.stocksBySector[sectorKey];
+          const ownsAllInSector = sectorStocks.every(stock => stock.owned > 0);
+          
+          if (ownsAllInSector && sectorStocks.length > 0) {
+            this.achievements[6].achieved = true;
+            this.showAchievementNotification(this.achievements[6]);
+            break;
+          }
+        }
+      }
+      
+      // Market crash survivor is checked during updateMarketTrend when a crash is detected
+      if (this.marketTrend < -0.8 && this.netWorth > 0 && !this.achievements[7].achieved) {
+        this.achievements[7].achieved = true;
+        this.showAchievementNotification(this.achievements[7]);
+      }
+    },
+    showAchievementNotification(achievement) {
+      alert(`Achievement Unlocked: ${achievement.name}\n${achievement.description}`);
     },
     buyUpgrade(upgrade) {
       if (this.player.cash >= upgrade.price && !upgrade.owned) {
@@ -287,24 +447,18 @@ const app = Vue.createApp({
         case 4: // Politician in Your Pocket
           // Occasional favorable regulation for a random sector
           setInterval(() => {
-            const sectors = [
-              [1, 7, 9], // Tech sector (TechGiant, SocialMedia, CryptoCorp)
-              [2, 10], // Finance sector (BankCorp, RealEstate)
-              [3, 4], // Energy sector (OilFutures, GreenEnergy)
-              [5, 6, 8] // Consumer sector (FoodChain, LuxuryBrand, MemeStock)
-            ];
-            
+            const sectors = Object.keys(this.sectors);
             const randomSector = sectors[Math.floor(Math.random() * sectors.length)];
-            const sectorNames = randomSector.map(id => this.stocks.find(s => s.id === id).name);
+            const sectorName = this.sectors[randomSector].name;
             
             this.newsItems.unshift({
-              headline: 'New regulation benefits ' + sectorNames.join(', ') + ' - your politician friend delivers',
+              headline: 'New regulation benefits ' + sectorName + ' sector - your politician friend delivers',
               effect: 'SECTOR BOOST'
             });
             
             // Boost all stocks in the sector
-            randomSector.forEach(id => {
-              const stock = this.stocks.find(s => s.id === id);
+            const sectorStocks = this.stocks.filter(stock => stock.sector === randomSector);
+            sectorStocks.forEach(stock => {
               stock.price *= 1.1; // 10% boost
               stock.change = 10;
             });
@@ -364,6 +518,30 @@ const app = Vue.createApp({
                 '</li>' +
               '</ul>' +
             '</div>' +
+            
+            '<div class="market-trends">' +
+              '<h2 class="market-title">Market Trends</h2>' +
+              '<div class="market-indicator">' +
+                '<div class="indicator-label">Overall Market:</div>' +
+                '<div class="indicator-bar">' +
+                  '<div class="indicator-value" :style="{ width: ((marketTrend + 1) * 50) + \'%\', backgroundColor: marketTrend >= 0 ? \'#4caf50\' : \'#f44336\' }"></div>' +
+                '</div>' +
+                '<div class="indicator-text">{{ marketTrend >= 0 ? "Bull Market" : "Bear Market" }} ({{ (marketTrend * 100).toFixed(1) }}%)</div>' +
+              '</div>' +
+              
+              '<div class="sector-indicators">' +
+                '<div v-for="(sector, key) in sectors" :key="key" class="sector-indicator">' +
+                  '<div class="indicator-label">{{ sector.name }}:</div>' +
+                  '<div class="indicator-bar">' +
+                    '<div class="indicator-value" :style="{ width: ((sector.trend + 1) * 50) + \'%\', backgroundColor: sector.trend >= 0 ? \'#4caf50\' : \'#f44336\' }"></div>' +
+                  '</div>' +
+                  '<div class="indicator-text">' +
+                    '{{ sector.trend >= 0 ? "Bullish" : "Bearish" }} ' +
+                    '({{ (sector.trend * 100).toFixed(1) }}%)' +
+                  '</div>' +
+                '</div>' +
+              '</div>' +
+            '</div>' +
           '</div>' +
           
           '<div class="side-panel">' +
@@ -395,6 +573,18 @@ const app = Vue.createApp({
                       '{{ upgrade.owned ? "Owned" : "Buy" }}' +
                     '</button>' +
                   '</div>' +
+                '</li>' +
+              '</ul>' +
+            '</div>' +
+            
+            '<div class="achievements">' +
+              '<h2 class="achievements-title">Achievements</h2>' +
+              '<ul class="achievements-list">' +
+                '<li v-for="achievement in achievements" :key="achievement.id" ' +
+                    'class="achievement-item" ' +
+                    ':class="{ \'achieved\': achievement.achieved }">' +
+                  '<div class="achievement-name">{{ achievement.name }}</div>' +
+                  '<div class="achievement-description">{{ achievement.description }}</div>' +
                 '</li>' +
               '</ul>' +
             '</div>' +
