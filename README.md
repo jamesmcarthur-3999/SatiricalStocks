@@ -1,114 +1,71 @@
-# Satirical Stocks
+# SatiricalStocks
 
 A satirical stock market simulation game that pokes fun at wealth hoarding while teaching investment principles.
 
-![Satirical Stocks Screenshot](assets/icons/icon.png)
+## Features Implemented
 
-## Quick Start
-
-To quickly try a working version of the game, open `minimal.html` directly in your browser. This is a simplified version that works without any build steps or dependencies.
-
-## About the Game
-
-Satirical Stocks is a tongue-in-cheek simulation game that lets players experience the absurdity of wealth accumulation through stock market trading. The game features:
-
-- Real-time stock market simulation with fluctuating prices
-- Multiple stock sectors with different volatility levels and correlations
-- Market trends (bull/bear/neutral) that influence overall pricing
-- Trading system with quantity selector and transaction fees
-- Satirical news events that affect the market
-- Taxes and economic events that mimic real-world mechanics
-- Humorous "upgrades" that poke fun at how the wealthy increase their fortunes
-- A wealth meter that tracks your progress from regular person to cartoon billionaire
-- Achievement system to reward different play styles
-- Event log to track your actions and market events
-- Beginner-friendly tutorial system
-
-## How to Play
-
-1. Start with a modest sum of cash ($10,000)
-2. Buy and sell stocks to increase your portfolio value
-3. React to satirical news events that affect stock prices
-4. Purchase ridiculous upgrades that help you accumulate wealth faster
-5. Complete achievements to earn rewards
-6. Track your progress on the wealth hoarding meter
-7. Try to become a billionaire (if you can handle the moral implications!)
-
-## Key Features
-
-### Market Simulation
-
-- Different sectors with varying volatility levels
-- Stock correlations within sectors
-- Market trends that shift periodically (bull, bear, neutral)
-- Realistic price movements with multiple factors
-
-### Trading System
-
-- Buy and sell multiple shares at once
-- Transaction fees on all trades
-- Portfolio tracking and performance metrics
-
-### Economic Mechanics
-
-- Periodic taxes on capital gains
-- Forced sales if you can't pay your taxes
-- Market crashes and booms
+### Core Game Mechanics
+- [x] Buy and sell stocks with realistic price movements
+- [x] Quantity selector for trading multiple shares at once
+- [x] Transaction fees for buy/sell operations
+- [x] Net worth tracking and wealth status progression
+- [x] Market trends and sector correlations
+- [x] Achievement system
+- [x] Portfolio management
 
 ### Satirical Elements
+- [x] Wealth percentile tracking that shows growing inequality
+- [x] Humorous news items that reflect real-world absurdities
+- [x] Upgrade descriptions that highlight questionable financial practices
+- [x] Achievements that satirize the path to wealth
 
-- Humorous news events that highlight real-world absurdities
-- Upgrade system that pokes fun at wealth accumulation tactics
-- Wealth status messages that become increasingly ridiculous
+### Technical Features
+- [x] Vue.js-based component architecture
+- [x] Reactive UI updates
+- [x] Chart visualization
+- [x] ES5-compatible JavaScript for maximum compatibility
+- [x] Responsive design
 
-### Quality of Life Features
+## Coming Soon
+- [ ] Save/load functionality
+- [ ] More detailed stock analysis tools
+- [ ] Additional upgrades with more complex effects
+- [ ] Market manipulation mechanics for players with high wealth
+- [ ] Economic crisis scenarios
+- [ ] Tutorial mode for beginners
+- [ ] Difficulty settings
 
-- Tutorial for new players
-- Game settings to customize difficulty and speed
-- Save/load system
-- Event log to track history
-- Achievement system for goals and rewards
+## What We've Learned
+This game is designed to teach some basic principles about investing and stock markets:
 
-## Development
+1. **Diversification** - Owning stocks across multiple sectors reduces risk
+2. **Market Trends** - Overall market movements affect individual stocks
+3. **Sector Correlation** - Stocks in the same sector often move together
+4. **Transaction Costs** - Fees eat into profits, especially for frequent traders
+5. **Risk/Reward Balance** - Higher volatility stocks can offer bigger gains (or losses)
 
-This game is built using Electron and Vue.js, packaged as a standalone executable for Windows.
+While teaching these principles, the game also satirizes:
 
-### Technology Stack
+1. The growing wealth inequality in modern economies
+2. How the ultra-wealthy can use their money to influence markets and policy
+3. The often absurd logic of market movements and corporate announcements
+4. The financial industry's tendency to create complex products that primarily benefit insiders
 
-- Electron (desktop application framework)
-- Vue.js (UI framework)
-- Chart.js (for stock charts)
+## How to Play
+Simply open `index.html` in your web browser. No installation or server required!
 
-## Getting Started
+## Current Development
+We've recently implemented:
+1. ✅ Quantity selector for stock trades
+2. ✅ Market trends and sector correlations 
+3. ✅ Transaction fee system
+4. ✅ Achievement system
+5. ✅ Upgrade effects
 
-See the [Installation Guide](INSTALLATION.md) for detailed instructions.
+Next on our roadmap:
+1. Economic crisis events
+2. More detailed stock analysis tools
+3. Market manipulation mechanics
 
-```bash
-# Install dependencies
-npm install
-
-# Run the application
-npm start
-
-# Build for Windows
-npm run build:win
-```
-
-## Troubleshooting
-
-If you encounter issues with the full application:
-
-1. Try the minimal demo (`minimal.html`) which doesn't require any build steps
-2. Check the browser console for any error messages
-3. Make sure all resources like CSS and JavaScript files are properly loaded
-4. If there are dependency issues, run `npm install` to ensure all required packages are installed
-
-## License
-
-MIT
-
-## Acknowledgments
-
-- Inspired by the absurdity of real-world wealth inequality
-- Created as a satirical commentary on the mechanisms of wealth accumulation
-- Designed to be educational while also being entertaining
+## Contributing
+Feel free to fork this repository and submit pull requests or open issues with suggestions!
